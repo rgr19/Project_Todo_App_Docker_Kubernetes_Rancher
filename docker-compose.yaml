@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  todo-redis:
+    container_name: todo-redis
+    image: redis:5.0.3
+    ports:
+      - 6379:6379
+
+  todo-postgres:
+    container_name: todo-postgres
+    image: postgres:11.2
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=todo
+      - POSTGRES_USER=todo
+      - POSTGRES_DB=todo
+
+  todo-elastic:
+    container_name: todo-elastic
+    image: elasticsearch:6.6.1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+
+  todo-api:
+    container_name: todo-api
+    image: todo-api:1.0
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./todo-api
+    ports:
+      - 3000:3000
+    environment:
+      - POSTGRES_HOST=todo-postgres
+      - POSTGRES_PASSWORD=todo
+      - POSTGRES_USER=todo
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=todo
+      - REDIS_HOST=todo-redis
+      - REDIS_PORT=6379
+      - ELASTICSEARCH_HOST=todo-elastic
+      - ELASTICSEARCH_PORT=9200
+    volumes:
+      - /app/node_modules
+    depends_on: # it will try to start those service as first, but they will be not ready - it require additional health checks
+      - todo-redis
+      - todo-postgres
+      - todo-elastic
+
+  todo-view:
+    container_name: todo-view
+    image: todo-view:1.0
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./todo-view
+    ports:
+      - 4200:4200
+    volumes:
+      - ./todo-view:/usr/src/app
+      - /usr/scr/app/node_modules
+    depends_on:
+      - todo-api
+
+  todo-proxy:
+    container_name: todo-proxy
+    image: todo-proxy:1.0
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./todo-proxy
+    ports:
+      - 8080:80
+    depends_on:
+      - todo-api
+      - todo-view
