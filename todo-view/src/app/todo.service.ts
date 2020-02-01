@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Todo } from './todo';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {Todo} from './todo';
 
 const BASE_PATH = '/api/v1';
+const COMP_PATH = '/compute/v1';
 
 @Injectable()
 export class TodoService {
@@ -20,8 +21,8 @@ export class TodoService {
   public insertTodo(todo: Todo): void {
     console.log('TodoService::insertTodo was called: ' + todo.title);
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.post(BASE_PATH + '/todos', todo, { headers: headers }).subscribe(
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    this.http.post(BASE_PATH + '/todos', todo, {headers: headers}).subscribe(
       res => {
         console.log(res);
       },
@@ -36,10 +37,16 @@ export class TodoService {
   public searchTodos(searchText: string): Observable<Object[]> {
     console.log('TodoService::searchTodos was called: ' + searchText);
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post(
       BASE_PATH + '/search',
-      { searchText: searchText },
-      { headers: headers }) as Observable<Object[]>;
+      {searchText: searchText},
+      {headers: headers}) as Observable<Object[]>;
+  }
+
+  public computeTask(computeInput: string): Observable<Object[]> {
+    console.log('TodoService::computeTask was called: ' + computeInput);
+
+    return this.http.get<Todo[]>(COMP_PATH + '/input') as Observable<Todo[]>;
   }
 }

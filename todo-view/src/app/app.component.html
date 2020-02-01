@@ -12,4 +12,12 @@
   <ul>
     <li *ngFor="let searchTodo of (searchResult$ | async)">{{ searchTodo._source.todotext }}</li>
   </ul>
+
+  <input placeholder="Compute" [(ngModel)]="computeInput" (keyup.enter)="computeTask()">
+  <h3>Compute Result</h3>
+  <ul>
+    <li *ngFor="let computeRes of (computeResult$ | async)">{{ computeRes }}</li>
+  </ul>
+
+
 </section>

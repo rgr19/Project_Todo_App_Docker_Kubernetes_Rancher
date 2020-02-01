@@ -22,6 +22,11 @@ services:
       - POSTGRES_DB=todo
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username todo" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   todo-elastic:
     container_name: todo-elastic
@@ -57,8 +62,29 @@ services:
       - /app/node_modules
     depends_on: # it will try to start those service as first, but they will be not ready - it require additional health checks
       - todo-redis
-      - todo-postgres
       - todo-elastic
+      - todo-postgres
+      # Only for version 2.1, removed in 3
+      #todo-redis:
+      #  condition: service_started
+      #todo-elastic:
+      #  condition: service_started
+      #todo-postgres:
+      #  condition: service_healthy
+
+  todo-flask:
+    container_name: todo-flask
+    image: docker-flask
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./todo-flask
+    ports:
+      - '5000:5000'
+    healthcheck:
+      test: curl --fail -s http://localhost:5000/ || exit 1
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
 
   todo-view:
     container_name: todo-view
@@ -73,6 +99,7 @@ services:
       - /usr/scr/app/node_modules
     depends_on:
       - todo-api
+      - todo-flask
 
   todo-proxy:
     container_name: todo-proxy
@@ -83,8 +110,10 @@ services:
     ports:
       - 8080:80
     depends_on:
+      - todo-flask
       - todo-api
       - todo-view
+
 
 volumes:
     postgres-data:
