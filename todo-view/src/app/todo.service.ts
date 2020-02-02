@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core/public_api';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Todo } from './todo';
