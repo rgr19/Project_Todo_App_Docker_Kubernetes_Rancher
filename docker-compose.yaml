@@ -1,120 +1,193 @@
 version: "3"
 
 services:
+  todo-rabbitmq:
+    container_name: todo-rabbitmq
+    image: rabbitmq:3.7.13-management
+    ports:
+      - 5672:5672
+      - 8081:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+
   todo-redis:
     container_name: todo-redis
     image: redis:5.0.3
     ports:
       - 6379:6379
-    restart: unless-stopped
 
   todo-postgres:
     container_name: todo-postgres
-    image: postgres:11.2
     build:
       context: ./todo-postgres
       dockerfile: Dockerfile.dev
+    image: todo-postgres:1.0
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_PASSWORD=todo
-      - POSTGRES_USER=todo
-      - POSTGRES_DB=todo
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready --username todo" ]
+      test: ["CMD-SHELL", "pg_isready --username ${POSTGRES_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
+  5
+todo-elastic:
+  container_name: todo-elastic
+  image: elasticsearch:6.6.1
+  ports:
+    - 9200:9200
+    - 9300:9300
+  environment:
+    - discovery.type=single-node
+  volumes:
+    - elastic-data:/usr/share/elasticsearch/data
 
-  todo-elastic:
-    container_name: todo-elastic
-    image: elasticsearch:6.6.1
-    ports:
-      - 9200:9200
-      - 9300:9300
-    environment:
-      - discovery.type=single-node
-    volumes:
-      - elastic-data:/usr/share/elasticsearch/data
+todo-cache-ingestion:
+  container_name: todo-cache-ingestion
+  build:
+    context: todo-cache-ingestion
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-cache-ingestion:1.0
+  command: sh /app/start.sh
+  environment:
+    - REDIS_HOST=${REDIS_HOST}
+    - REDIS_PORT=${REDIS_PORT}
+    - RABBITMQ_URL=${RABBITMQ_URL}
+    - STORAGE_SERVICE_URL=${STORAGE_SERVICE_URL}
+  depends_on:
+    - todo-redis
+    - todo-rabbitmq
 
-  todo-api:
-    container_name: todo-api
-    image: todo-api:1.0
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./todo-api
-    command: sh /app/start.sh
-    ports:
-      - 3000:3000
-    environment:
-      - POSTGRES_HOST=todo-postgres
-      - POSTGRES_PASSWORD=todo
-      - POSTGRES_USER=todo
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=todo
-      - REDIS_HOST=todo-redis
-      - REDIS_PORT=6379
-      - ELASTICSEARCH_HOST=todo-elastic
-      - ELASTICSEARCH_PORT=9200
-    volumes:
-      - /app/node_modules
-    depends_on: # it will try to start those service as first, but they will be not ready - it require additional health checks
-      - todo-redis
-      - todo-elastic
-      - todo-postgres
-      # Only for version 2.1, removed in 3
-      #todo-redis:
-      #  condition: service_started
-      #todo-elastic:
-      #  condition: service_started
-      #todo-postgres:
-      #  condition: service_healthy
+todo-cache-service:
+  container_name: todo-cache-service
+  build:
+    context: todo-cache-service
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-cache-service:1.0
+  ports:
+    - 3001:3000
+  environment:
+    - REDIS_HOST=${REDIS_HOST}
+    - REDIS_PORT=${REDIS_PORT}
+  depends_on:
+    - todo-redis
 
-  todo-flask:
-    container_name: todo-flask
-    image: docker-flask
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./todo-flask
-    ports:
-      - '5000:5000'
-    healthcheck:
-      test: curl --fail -s http://localhost:5000/ || exit 1
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
+todo-search-ingestion:
+  container_name: todo-search-ingestion
+  build:
+    context: todo-search-ingestion
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-search-ingestion:1.0
+  command: sh /app/start.sh
+  environment:
+    - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
+    - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+    - RABBITMQ_URL=${RABBITMQ_URL}
+  depends_on:
+    - todo-elastic
+    - todo-rabbitmq
 
-  todo-view:
-    container_name: todo-view
-    image: todo-view:1.0
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./todo-view
-    ports:
-      - 4200:4200
-    volumes:
-      - ./todo-view:/usr/src/app
-      - /usr/scr/app/node_modules
-    depends_on:
-      - todo-api
-      - todo-flask
+todo-search-service:
+  container_name: todo-search-service
+  build:
+    context: todo-search-service
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-search-service:1.0
+  command: sh /app/start.sh
+  ports:
+    - 3002:3000
+  environment:
+    - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
+    - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+  depends_on:
+    - todo-elastic
 
-  todo-proxy:
-    container_name: todo-proxy
-    image: todo-proxy:1.0
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./todo-proxy
-    ports:
-      - 8080:80
-    depends_on:
-      - todo-flask
-      - todo-api
-      - todo-view
+todo-storage-ingestion:
+  container_name: todo-storage-ingestion
+  build:
+    context: todo-storage-ingestion
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-storage-ingestion:1.0
+  command: sh /app/start.sh
+  environment:
+    - POSTGRES_HOST=${POSTGRES_HOST}
+    - POSTGRES_PORT=${POSTGRES_PORT}
+    - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - RABBITMQ_URL=${RABBITMQ_URL}
+  depends_on:
+    - todo-postgres
+    - todo-rabbitmq
 
+todo-storage-service:
+  container_name: todo-storage-service
+  build:
+    context: todo-storage-service
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-storage-service:1.0
+  ports:
+    - 3003:3000
+  environment:
+    - POSTGRES_HOST=${POSTGRES_HOST}
+    - POSTGRES_PORT=${POSTGRES_PORT}
+    - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  depends_on:
+    - todo-postgres
+
+todo-api-gateway:
+  container_name: todo-api-gateway
+  build:
+    context: todo-api-gateway
+    dockerfile: ../Dockerfile.nodejs.dev
+  image: todo-api-gateway:1.0
+  command: sh /app/start.sh
+  ports:
+    - 3000:3000
+  environment:
+    - RABBITMQ_URL=${RABBITMQ_URL}
+    - CACHE_SERVICE_URL=${CACHE_SERVICE_URL}
+    - SEARCH_SERVICE_URL=${SEARCH_SERVICE_URL}
+    - STORAGE_SERVICE_URL=${STORAGE_SERVICE_URL}
+  depends_on:
+    - todo-cache-service
+    - todo-cache-ingestion
+    - todo-search-service
+    - todo-search-ingestion
+    - todo-storage-service
+    - todo-storage-ingestion
+    - todo-rabbitmq
+
+todo-view:
+  container_name: todo-view
+  build:
+    context: ./todo-view
+    dockerfile: Dockerfile.dev
+  image: todo-view:1.0
+  ports:
+    - 4200:4200
+  volumes:
+    - ${PWD}/todo-view:/usr/src/app
+    - /usr/src/app/node_modules
+  depends_on:
+    - todo-api-gateway
+
+todo-proxy:
+  container_name: todo-proxy
+  build:
+    context: ./todo-proxy
+    dockerfile: Dockerfile.dev
+  image: todo-proxy:1.0
+  ports:
+    - 8080:80
+  depends_on:
+    - todo-api-gateway
+    - todo-view
 
 volumes:
-    postgres-data:
-    elastic-data:
+  postgres-data:
+  elastic-data:
