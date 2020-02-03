@@ -21,3 +21,4 @@ Thumbs.db
 # CUSTOM
 npm_install_failed.txt
 npm_install_success.txt
+package-lock.json
