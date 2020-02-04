@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-# shellcheck disable=SC2164
-CWD=$PWD
-cd task
-WDIR='prod' ./dc "$@"
-cd $CWD
-

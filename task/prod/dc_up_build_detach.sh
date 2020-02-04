@@ -1,1 +1,0 @@
-../dev/dev/dc_up_build_detach.sh
