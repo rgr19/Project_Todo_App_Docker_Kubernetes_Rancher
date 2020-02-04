@@ -3,41 +3,41 @@ version: "3"
 services:
 
   todo-postgres:
-    container_name: todo-postgres
     image: ${REPO_USER}/todo-postgres:1.0
 
   todo-cache-ingestion:
-    container_name: todo-cache-ingestion
     image: ${REPO_USER}/todo-cache-ingestion:1.0
+    #we are no longer executing by root, but with user node
+    command: sh /home/node/app/start.sh
 
   todo-cache-service:
-    container_name: todo-cache-service
     image: ${REPO_USER}/todo-cache-service:1.0
 
   todo-search-ingestion:
-    container_name: todo-search-ingestion
     image: ${REPO_USER}/todo-search-ingestion:1.0
+    command: sh /home/node/app/start.sh
 
   todo-search-service:
-    container_name: todo-search-service
     image: ${REPO_USER}/todo-search-service:1.0
+    command: sh /home/node/app/start.sh
 
   todo-storage-ingestion:
-    container_name: todo-storage-ingestion
     image: ${REPO_USER}/todo-storage-ingestion:1.0
+    command: sh /home/node/app/start.sh
 
   todo-storage-service:
-    container_name: todo-storage-service
     image: ${REPO_USER}/todo-storage-service:1.0
 
   todo-api-gateway:
-    container_name: todo-api-gateway
     image: ${REPO_USER}/todo-api-gateway:1.0
+    command: sh /home/node/app/start.sh
 
   todo-view:
-    container_name: todo-view
     image: ${REPO_USER}/todo-view:1.0
+    # dc is appending to array, not overriding it,
+    # so we can not use 4200 again
+    ports:
+      - 4201:8080 # to match todo-view/custom.nginx
 
   todo-proxy:
-    container_name: todo-proxy
     image: ${REPO_USER}/todo-proxy:1.0

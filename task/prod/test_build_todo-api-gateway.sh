@@ -5,5 +5,5 @@ if [ -z "$REPO_USER" ]; then
 fi
 
 docker build ../../src/todo-api-gateway \
-             -f ../../src/common/Dockerfile.nodejs.prod \
+             -f ../../src/common/Dockerfile.nodejs.builds \
              -t ${REPO_USER}/todo-api-gateway:1.0
