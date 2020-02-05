@@ -6,9 +6,9 @@ if [ ! -d "$WDIR" ]; then
   echo "[ERROR] task/$WDIR do not exist"
 fi
 
-if [ ! -f "$WDIR/docker-compose.yaml" ]; then
-  if [ ! -L "$WDIR/docker-compose.yaml" ]; then
-    ln -s "../dev/docker-compose.yaml" "$WDIR/docker-compose.yaml"
+if [ ! -f "$WDIR/docker-compose.yml" ]; then
+  if [ ! -L "$WDIR/docker-compose.yml" ]; then
+    ln -s "../dev/docker-compose.yml" "$WDIR/docker-compose.yml"
   fi
 fi
 
