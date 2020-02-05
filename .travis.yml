@@ -29,8 +29,8 @@ before_install:
 
 # Build development images for test
 before_script:
-  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t rgr19/todo-view-test
-  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t rgr19/todo-cache-service-test
+  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $GITHUB_USER/todo-view-test
+  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $GITHUB_USER/todo-cache-service-test
 
 # Run some tests
 script:
