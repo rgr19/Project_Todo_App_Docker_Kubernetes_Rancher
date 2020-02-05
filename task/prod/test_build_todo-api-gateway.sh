@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -z "$REPO_USER" ]; then
-  REPO_USER="$(cat ../../REPO_USER)"
+  DOCKER_HUB_ID="$(cat ../../DOCKER_HUB_ID)"
 fi
 
 docker build ../../src/todo-api-gateway \
