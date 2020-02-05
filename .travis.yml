@@ -29,13 +29,15 @@ before_install:
 
 # Build development images for test
 before_script:
-  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t "$GITHUB_USER"/todo-view-test
-  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t "$GITHUB_USER"/todo-cache-service-test
+  - echo $GITHUB_USER/todo-view-test
+  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $GITHUB_USER/todo-view-test
+  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $GITHUB_USER/todo-cache-service-test
 
 # Run some tests
 script:
-  - docker run "$GITHUB_USER"/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
-  - docker run "$GITHUB_USER"/todo-cache-service-test npm test
+  - echo $GITHUB_USER
+  - docker run $GITHUB_USER/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+  - docker run $GITHUB_USER/todo-cache-service-test npm test
 
 after_success:
   # Build Production Images for deployment
