@@ -22,7 +22,7 @@ if [ -z "$NPM_INSTALL_FAST" ]; then
   NPM_INSTALL_FAST=false
 fi
 
-DIRS="$(find $PWD/../../src -maxdepth 2 -name package.json -type f)"
+DIRS="$(find $PWD/../../../src -maxdepth 2 -name package.json -type f)"
 
 if [ "$NPM_INSTALL_FAST" == 'false' ]; then
 
