@@ -7,11 +7,12 @@ services:
 # Install latest Docker CE so we can use Dockerfile outside build context
 addons:
   apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+   packages:
       - docker-ce
+# move chrome install to todo-view Dockerfile.dev (its failing here anyway)
+#     - google-chrome-stable
+#  sources:
+#     - google-chrome
 
 # Install any dependencies, update Docker Compose to 1.23.2 so we can use Dockerfile outside build context
 before_install:
