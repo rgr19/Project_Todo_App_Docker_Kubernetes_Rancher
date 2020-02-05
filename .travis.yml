@@ -34,8 +34,8 @@ before_script:
 
 # Run some tests
 script:
-  - docker run rgr19/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
-  - docker run rgr19/todo-cache-service-test npm test
+  - docker run $GITHUB_USER/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+  - docker run $GITHUB_USER/todo-cache-service-test npm test
 
 after_success:
   # Build Production Images for deployment
