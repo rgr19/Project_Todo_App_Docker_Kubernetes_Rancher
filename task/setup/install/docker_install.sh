@@ -11,7 +11,7 @@ if [[ "$DC_VER_NEW" != *"$DC_VER_CUR"* ]]; then
 	DC_URL=$DC_URL/$DC_VER/docker-compose-$(uname -s)-$(uname -m)
 	sudo curl -L $DC_URL -o /usr/local/bin/docker-compose
 	if [ $? -eq 0 ]; then
-		chmod +x /usr/local/bin/docker-compose
+		sudo chmod +x /usr/local/bin/docker-compose
 		docker-compose --version
 	fi
 fi
