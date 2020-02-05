@@ -39,10 +39,8 @@ script:
 
 after_success:
   # Build Production Images for deployment
-  - ./prod_dc.sh build
-
+  - ./prod_dc build
   # Login to Docker Hub
   - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-
   # Take the built production images and push to Docker Hub
-  - ./prod_dc.sh push
+  - ./prod_dc push
