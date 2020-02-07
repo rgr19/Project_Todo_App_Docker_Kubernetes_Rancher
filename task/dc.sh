@@ -27,10 +27,8 @@ for d in "dev/dc_"*; do
   fi
 done
 
-. travis.sh
-
 cd "$WDIR"
 echo "###################################################################"
 echo "##### [INFO] Executing docker-compose from inside '$WDIR' directory"
 echo "###################################################################"
-#docker-compose "$@"
+docker-compose "$@"

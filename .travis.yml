@@ -10,15 +10,13 @@ before_install:
 - "./task/setup/install/docker_install.sh"
 env:
   global:
-    secure: gnaY506UnyxAcKLZhWZUnfWXHUucuhyeDuP9FiU6cdpQCJIS8264+t4uvsicQQ2Xd151n7V8Y3FbBv6KrAZPNxAh8t453iMxXa+O3fpp6JKtFUBH22zIWzOTt/PX6Rdynsni8Lhp2ItmoXnPWEbldUl7kfiVyQqy0atEgwCqvRZQW1C6WZVOT8ONPvMlQluQm5agk8IzCdFF+5+wUR5W81487rlpvCtLVkV/f71VSDLxE9FGMFETEf73ioFllbSllYW4pp5rm1q44UfrboEbVjCBwSER82MddafPP/oO9LQHQsyNW/uNkDFqQAyAUM2yXxdxSbVHzAJeh0w/3D7im5Dg0BdubOcYHcXS8znk2fMSO1GUBTWzwbrZeG396CkydFREA1oIpwGMOY+enwhv37xF85IXf1sgsLurz1cWlXHOP5VVItlhpTKXSqEfzvvcdXxsxyqLOkE9OKLcqyU4mDNHH9brFwYc1Gb3Z5hrdto+g+AWsJkrBvaW5rlvgNY8TNlJdjO8WQi6JdM8oUrrwHybloCNRpd+HK5REyfZf0xsg7EOvw7oRCl8r3/YFygLirE6mI6bAH2vP84xrlNqbG2+DSlhqc3/w8MDx8dFwXUYb6SkHevwrE85lOyDeWuHh9ZMwaiI+zVUa766iKIkqpueEdwme2iR1k9e9RH3Sjs=
+    secure: lrUEMvOgigwghnYu2UaTLotOCBWcaFOxHrK/MntG4jdmiQAExspcnFaltZ9j79kEA0qfF8h2ZIcrRlRtmJnHdiCyFWezyRNZ3h4QzpcoP5/qqmCxBtwVyxc1CSIihyOp3zKa8tPT87ZTwm00p9FL708djhSyahUm5fqzYdIfTiUMpW9Wk+jHen68+sHxR7RtE8qdTZVjFykjXpTeaHOvi58ScqKbIKIfOdcueq6s0owXCp0HVq6ylTdUTGnf4UU0Yz2LifhouPwB8Oqx0GLE5Blog4awyGy8wztEw5PSeodwjffLyir00Wig1mOEnlkBRAdoK2g5pkXfM8y0Qc6iXsHki+ErrkqIiqXg58qm5fo5VmusynJ4jMguDYLp8Yp+6QZSKtNxl2vHSb9/9c1vu+u9Aa2btmy4wCEt1K/OnG39Nb0MmFeJIg6IJ22YiXp9swLWT4r4NeEKDR3zBOQkt7KImWzoOYrwvoqg96L5H05wZMXizcTLfIuUEykHN774oRElhnumBP7F51B9O3mjwtQK2MIq72Ep6UEGqCRw6gmyyIZadH2eiC8glTh6vCybDS3kFpTio4SndX0EjLIU0iIsKozBn7Gk3keGK35lQMJzuoeso3kSqYbL1m9n5UFagfH8eJZfmjKoPjLBldduGX+U0TY0szhavboFQ8OcuCI=
 before_script:
 - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
 - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
-- docker run $DOCKER_HUB_ID/todo-view-test npm test --
-  --browsers=ChromeHeadlessNoSandbox
-  --watch=false
-  --no-progress
+- docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
+  --watch=false --no-progress
 - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
 - "./prod_dc build"
