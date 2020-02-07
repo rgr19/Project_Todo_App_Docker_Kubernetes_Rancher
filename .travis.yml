@@ -1,63 +1,38 @@
 dist: trusty
 sudo: required
 services:
-  - docker
-
-# Get Google Chrome headless browser for Angular tests
-# Install latest Docker CE so we can use Dockerfile outside build context
+- docker
 addons:
   apt:
-   packages:
-      - docker-ce
-# move chrome install to todo-view Dockerfile.dev (its failing here anyway)
-#     - google-chrome-stable
-#  sources:
-#     - google-chrome
-
-# Install any dependencies, update Docker Compose to 1.23.2 so we can use Dockerfile outside build context
+    packages:
+    - docker-ce
 before_install:
- - ./task/setup/install/docker_install.sh
-# above script does what lines below
-#  - docker --version
-#  - docker-compose --version
-#  - sudo rm /usr/local/bin/docker-compose
-#  - curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
-#  - chmod +x docker-compose
-#  - sudo mv docker-compose /usr/local/bin
-#  - docker-compose --version
-#install:
-
-# One build will be triggered for each line in the env array.
+- "./task/setup/install/docker_install.sh"
 env:
-  - DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID) GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH) GITHUB_USER=$(cat .env/GITHUB_USER)
-
-# Build development images for test
+  global:
+    secure: gnaY506UnyxAcKLZhWZUnfWXHUucuhyeDuP9FiU6cdpQCJIS8264+t4uvsicQQ2Xd151n7V8Y3FbBv6KrAZPNxAh8t453iMxXa+O3fpp6JKtFUBH22zIWzOTt/PX6Rdynsni8Lhp2ItmoXnPWEbldUl7kfiVyQqy0atEgwCqvRZQW1C6WZVOT8ONPvMlQluQm5agk8IzCdFF+5+wUR5W81487rlpvCtLVkV/f71VSDLxE9FGMFETEf73ioFllbSllYW4pp5rm1q44UfrboEbVjCBwSER82MddafPP/oO9LQHQsyNW/uNkDFqQAyAUM2yXxdxSbVHzAJeh0w/3D7im5Dg0BdubOcYHcXS8znk2fMSO1GUBTWzwbrZeG396CkydFREA1oIpwGMOY+enwhv37xF85IXf1sgsLurz1cWlXHOP5VVItlhpTKXSqEfzvvcdXxsxyqLOkE9OKLcqyU4mDNHH9brFwYc1Gb3Z5hrdto+g+AWsJkrBvaW5rlvgNY8TNlJdjO8WQi6JdM8oUrrwHybloCNRpd+HK5REyfZf0xsg7EOvw7oRCl8r3/YFygLirE6mI6bAH2vP84xrlNqbG2+DSlhqc3/w8MDx8dFwXUYb6SkHevwrE85lOyDeWuHh9ZMwaiI+zVUa766iKIkqpueEdwme2iR1k9e9RH3Sjs=
 before_script:
-  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
-  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
-
-# Run some tests
+- docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
+- docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
-  - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
-  - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
-
+- docker run $DOCKER_HUB_ID/todo-view-test npm test --
+  --browsers=ChromeHeadlessNoSandbox
+  --watch=false
+  --no-progress
+- docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
-  # Build Production Images for deployment
-  - ./prod_dc build
-  # Login to Docker Hub
-  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-  # Take the built production images and push to Docker Hub
-  - ./prod_dc push
-
+- "./prod_dc build"
+- echo "$DOCKER_HUB_PASSWORD_ENCRYPTED" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+- "./prod_dc push"
 deploy:
   provider: elasticbeanstalk
-  region:  us-east-2
+  region: us-east-2
   app: Todo App
   env: todo-app-env
   bucket_name: elasticbeanstalk-us-east-2-277466026916
   bucket_path: todo-app
   on:
-    branch: $GITHUB_BRANCH
-  access_key_id: $AWS_ACCESS_KEY
+    branch: "$GITHUB_BRANCH"
+  access_key_id: "$AWS_KEY_ID_ENCRYPTED"
   secret_access_key:
-    secure: $AWS_SECRET_KEY
+    secure: "$AWS_SECRET_KEY_ENCRYPTED"

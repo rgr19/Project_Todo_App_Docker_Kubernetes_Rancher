@@ -27,15 +27,10 @@ for d in "dev/dc_"*; do
   fi
 done
 
-# source common functions
-. common.sh
-
-# save current branch name
-get_github_branch_current >> ../.env/GITHUB_BRANCH
-get_git_user_name >> ../.env/GITHUB_USER
+. travis.sh
 
 cd "$WDIR"
 echo "###################################################################"
 echo "##### [INFO] Executing docker-compose from inside '$WDIR' directory"
 echo "###################################################################"
-docker-compose "$@"
+#docker-compose "$@"
