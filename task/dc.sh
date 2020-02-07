@@ -27,8 +27,37 @@ for d in "dev/dc_"*; do
   fi
 done
 
+. common.sh
+
+function guess_build_type() {
+
+  if [[ "$WDIR" == *'dev'* ]]; then
+    BUILD_TYPE='dev'
+  elif [[ "$WDIR" == *'prod'* ]]; then
+    BUILD_TYPE='prod'
+  fi
+
+}
+
+function reload_env() {
+  local ENV_STRING=""
+  read_env_variables ENV_STRING ".env.dc" "../../.env/*"
+  guess_build_type
+
+  ENV_STRING="BUILD_TYPE=$BUILD_TYPE $ENV_STRING"
+
+  echo "[INFO] set env variables..."
+  echo "" > ".env"
+  for pair in $ENV_STRING; do
+    echo "     | $pair"
+    echo "$pair" >>".env"
+  done
+}
+
 cd "$WDIR"
 echo "###################################################################"
 echo "##### [INFO] Executing docker-compose from inside '$WDIR' directory"
 echo "###################################################################"
+
+reload_env
 docker-compose "$@"

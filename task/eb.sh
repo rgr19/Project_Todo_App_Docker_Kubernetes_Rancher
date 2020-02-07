@@ -29,13 +29,10 @@ function set_eb_env() {
   fi
 }
 
+
 function upload_env() {
-  local ENV_HASHMAP
   local ENV_STRING=""
-  declare -A ENV_HASHMAP
-  read_files_to_hashmap ENV_HASHMAP ".env" ".env.aws"
-  # declare -p ENV_HASHMAP # check hashmap content
-  hashmap_to_string ENV_HASHMAP ENV_STRING
+  read_env_variables ENV_STRING ".env.dc .env.aws" "../../.env/*"
 
   echo "[INFO] will set env variables..."
   for pair in $ENV_STRING; do
@@ -55,7 +52,7 @@ ARGIN="$@"
 set_eb_env
 
 if [[ "$ARGIN" == 'repenv' ]]; then
-  upload_env
+    upload_env
 else
   eb "$ARGIN"
 fi

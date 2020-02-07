@@ -17,21 +17,40 @@ app.use(
     })
 );
 
+function client_ping(client) {
+    // Ping the client to be sure Elastic is up
+    client.ping({
+        requestTimeout: 30000,
+    }, function (error) {
+        if (error) {
+            console.error('Something went wrong with Elasticsearch: ' + error);
+            return false;
+        } else {
+            console.log('Elasticsearch client connected');
+            return true;
+        }
+    });
+}
+
 // Elasticsearch Client Setup //////////////////////////////////////////////////////////////////////////////////////////
-const elasticClient = new elasticsearch.Client({
-    // hosts: [ envProps.elasticHost + ':' + envProps.elasticPort]
-    hosts: [ envProps.elasticHost ]
-});
-// Ping the client to be sure Elastic is up
-elasticClient.ping({
-    requestTimeout: 30000,
-}, function(error) {
-    if (error) {
-        console.error('Something went wrong with Elasticsearch: ' + error);
-    } else {
-        console.log('Elasticsearch client connected');
+function try_elastic_connect() {
+
+    let client;
+    client = new elasticsearch.Client({
+        hosts: [envProps.elasticHost]
+    });
+    if (!client_ping(client)) {
+        client = new elasticsearch.Client({
+            hosts: [envProps.elasticHost + ':' + envProps.elasticPort]
+        });
     }
-});
+    return client;
+}
+
+const elasticClient = try_elastic_connect();
+
+// Ping the client to be sure Elastic is up
+client_ping(elasticClient);
 
 // Set up the API routes ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,14 +75,14 @@ app.route('/api/v1/search').post((req, res) => {
             }
         }
     })
-    .then(results => {
-        console.log('Search for "' + searchText + '" matched (' + results.hits.hits.length + ')');
-        res.send(results.hits.hits);
-    })
-    .catch(err => {
-        console.log(err);
-        res.send([]);
-    });
+        .then(results => {
+            console.log('Search for "' + searchText + '" matched (' + results.hits.hits.length + ')');
+            res.send(results.hits.hits);
+        })
+        .catch(err => {
+            console.log(err);
+            res.send([]);
+        });
 });
 
 

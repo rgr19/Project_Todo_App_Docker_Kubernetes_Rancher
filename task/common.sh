@@ -21,8 +21,8 @@ function string_to_hashmap() {
 
 function read_files_to_hashmap() {
 
-  if [[ $# -le 2 ]]; then
-    echo "[ERROR] Wrong number of arguments: $# <= 2"
+  if [[ $# -lt 2 ]]; then
+    echo "[ERROR] Wrong number of arguments: $# < 2"
     exit 1
   fi
 
@@ -64,6 +64,32 @@ function hashmap_to_string() {
 
   _string="${array[@]}"
 }
+
+function read_dir_to_hashmap() {
+
+  local -n _hashmap=$1
+  shift
+  local dirList=$@
+
+  for d in $dirList; do
+    _hashmap["$(basename $d)"]="$(cat $d)"
+  done
+}
+
+function read_env_variables() {
+  local ENV_HASHMAP
+  local -n _ENV_STRING=$1
+  local ENV_FILES="$2"
+  local ENV_DIRS="$3"
+  echo $ENV_FILES $ENV_DIRS
+  declare -A ENV_HASHMAP
+  read_files_to_hashmap ENV_HASHMAP $ENV_FILES
+  read_dir_to_hashmap ENV_HASHMAP $ENV_DIRS
+  # declare -p ENV_HASHMAP # check hashmap content
+  hashmap_to_string ENV_HASHMAP _ENV_STRING
+}
+
+
 
 function get_github_branch_current() {
   git rev-parse --abbrev-ref HEAD
