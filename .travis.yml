@@ -27,15 +27,20 @@ before_install:
 #  - docker-compose --version
 #install:
 
+env:
+  - DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID)
+  - GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH)
+  - GITHUB_USER=$(cat .env/GITHUB_USER)
+
 # Build development images for test
 before_script:
-  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $GITHUB_USER/todo-view-test
-  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $GITHUB_USER/todo-cache-service-test
+  - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
+  - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 
 # Run some tests
 script:
-  - docker run $GITHUB_USER/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
-  - docker run $GITHUB_USER/todo-cache-service-test npm test
+  - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+  - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 
 after_success:
   # Build Production Images for deployment
@@ -47,13 +52,13 @@ after_success:
 
 deploy:
   provider: elasticbeanstalk
-  region: <YOUR-AWS_REGION>
-  app: <YOUR-EB_APP_NAME>
-  env: <YOUR-EB_ENV_NAME>
-  bucket_name: <YOUR-EB_S3_BUCKET_NAME>
+  region:  us-east-2
+  app: Todo App
+  env: todo-app-env
+  bucket_name: elasticbeanstalk-us-east-2-277466026916
   bucket_path: todo-app
   on:
-    branch: master
+    branch: $GITHUB_BRANCH
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key:
     secure: $AWS_SECRET_KEY

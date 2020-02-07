@@ -1,5 +1,8 @@
 #!/bin/bash
-
+# shellcheck disable=SC2164
+# shellcheck disable=SC2124
+# shellcheck disable=SC2034
+# shellcheck disable=SC2086
 
 if [ -z "$WDIR" ]; then
   echo "[ERROR] env var WDIR can not be EMPTY"
@@ -11,63 +14,30 @@ if [ ! -d "$WDIR" ]; then
   exit 2
 fi
 
+# source common functions
+. common.sh
 
-# shellcheck disable=SC2164
-cd "$WDIR"
-echo "#####################################################################"
-echo "##### [INFO] Executing ElasticBeanstalk from inside '$WDIR' directory"
-echo "#####################################################################"
-
-# shellcheck disable=SC2124
-ARGIN="$@"
-
-function string_to_hashmap() {
-  local CHAR='='
-
-  local array=( $1 )
-  local -n _hashmap=$2 # use nameref for indirection
-  for x in "${array[@]}" ; do
-     KEY="${x%%${CHAR}*}"
-     VALUE="${x##*${CHAR}}"
-     _hashmap["$KEY"]="$VALUE"
-  done
-
-}
-
-function hashmap_to_string() {
-  local CHAR='='
-  local -n _hashmap=$1 # use nameref for indirection
-  local -n _string=$2
-
-  local KEYS=${!_hashmap[@]}
-
-  KEYS=$(echo $KEYS | tr ' ' '\n' | sort | tr '\n' ' ')
-
-  local array=( )
-  local pair
-  for key in $KEYS; do
-    pair=("$key=${_hashmap[$key]}")
-    array+=( $pair )
-#    echo "$pair"
-  done
-
-  _string="${array[@]}"
+function set_eb_env() {
+  # check env
+  echo "[INFO] env get status..."
+  if ! (eb status); then
+    envList=$(eb list)
+    echo "[INFO] env not set, setting ${envList[0]}"
+    eb use ${envList[0]}
+    echo "[INFO] env get status..."
+    eb status
+  fi
 }
 
 function upload_env() {
-
+  local ENV_HASHMAP
+  local ENV_STRING=""
   declare -A ENV_HASHMAP
-  declare -A ENV_STRING
-  DOCKER_ENV="$(cat .env)"
-  AWS_EB_ENV="$(cat .env.aws)"
-  string_to_hashmap "$DOCKER_ENV" ENV_HASHMAP
-  string_to_hashmap "$AWS_EB_ENV" ENV_HASHMAP
-  hashmap_to_string ENV_HASHMAP ENV_STRING
+  read_files_to_hashmap ENV_HASHMAP ".env" ".env.aws"
   # declare -p ENV_HASHMAP # check hashmap content
-  # shellcheck disable=SC2086
-  echo "[INFO] Update env for..."
-  eb status
-  echo "[INFO] with variables..."
+  hashmap_to_string ENV_HASHMAP ENV_STRING
+
+  echo "[INFO] will set env variables..."
   for pair in $ENV_STRING; do
     echo "     | $pair"
   done
@@ -76,10 +46,16 @@ function upload_env() {
   echo "[INFO] update done."
 }
 
+cd "$WDIR"
+echo "#####################################################################"
+echo "##### [INFO] Executing ElasticBeanstalk from inside '$WDIR' directory"
+echo "#####################################################################"
+
+ARGIN="$@"
+set_eb_env
+
 if [[ "$ARGIN" == 'repenv' ]]; then
   upload_env
 else
   eb "$ARGIN"
 fi
-
-
