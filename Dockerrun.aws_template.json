@@ -10,7 +10,7 @@
     },
     {
       "name": "todo-cache-ingestion",
-      "image": "onceawaken/todo-cache-ingestion:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-cache-ingestion:1.0",
       "hostname": "todo-cache-ingestion",
       "memory": 128,
       "essential": false,
@@ -22,14 +22,14 @@
     },
     {
       "name": "todo-cache-service",
-      "image": "onceawaken/todo-cache-service:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-cache-service:1.0",
       "hostname": "todo-cache-service",
       "memory": 128,
       "essential": false
     },
     {
       "name": "todo-search-ingestion",
-      "image": "onceawaken/todo-search-ingestion:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-search-ingestion:1.0",
       "hostname": "todo-search-ingestion",
       "memory": 128,
       "essential": false,
@@ -41,14 +41,14 @@
     },
     {
       "name": "todo-search-service",
-      "image": "onceawaken/todo-search-service:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-search-service:1.0",
       "hostname": "todo-search-service",
       "memory": 128,
       "essential": false
     },
     {
       "name": "todo-storage-ingestion",
-      "image": "onceawaken/todo-storage-ingestion:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-storage-ingestion:1.0",
       "hostname": "todo-storage-ingestion",
       "memory": 128,
       "essential": false,
@@ -60,14 +60,14 @@
     },
     {
       "name": "todo-storage-service",
-      "image": "onceawaken/todo-storage-service:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-storage-service:1.0",
       "hostname": "todo-storage-service",
       "memory": 128,
       "essential": false
     },
     {
       "name": "todo-api-gateway",
-      "image": "onceawaken/todo-api-gateway:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-api-gateway:1.0",
       "hostname": "todo-api-gateway",
       "memory": 128,
       "essential": false,
@@ -80,14 +80,14 @@
     },
     {
       "name": "todo-view",
-      "image": "onceawaken/todo-view:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-view:1.0",
       "hostname": "todo-view",
       "memory": 768,
       "essential": false
     },
     {
       "name": "todo-proxy",
-      "image": "onceawaken/todo-proxy:1.0",
+      "image": "${DOCKER_HUB_ID}/todo-proxy:1.0",
       "memory": 128,
       "essential": true,
       "portMappings": [

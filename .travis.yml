@@ -10,7 +10,7 @@ before_install:
 - "./task/setup/install/docker_install.sh"
 env:
   global:
-    secure: J3BLjKM527aOPWTGVlckCTJXlb3dlFZGZgoGRph6rlo+/yx+leJ0JfjeSJCNsIGlyHrupcx4m70ubRH48vgY8QsFH5WwGXDBoyxBoNlvXGBwH1RCbrMNpb1P8uAPFgIC1MtKY9YmcL5lTzv5tRwCBNOyexuc+oV0KiAVZOGtfAgEZ03mHXLSJZcSQMBV1o5LpmfgrixU/jBlRDTlTZB55MFK2N2ZZqVUOpnf/qoiLL8rw1hNPk/PzPkd+jczQmju6FHuqCxmHWDBhI5POEf4ejlfQ49+OZFzaqAblN3EeG43jRXDLpKZAgoOpE2JXuRylMgfGanvyjXMmeq/B+UhI/4QSpIXNeE6WRB+pNAOl/ZeUEPoX+8qCqqI+1daKAkGIELPBbmJCLdcdHUsETj2XmhSkP0sdVOzALk90enoD8V2sE7g98rJpDnTqTwavCO0moNuWs2Dw8v8RfZetEugCHZwg9KC5/LNmT9wKJJpXyAkbCz50nz21689gYYhcE7mL+lj/ZmOcye2DP+OVoQOxqshELnkSFbMWb+KVuYA2+6uVWQXqUZxuoK4efZZeA/1Q1PH1q30p4AZSlgjwN4zbW+UBEE3iAtrE8qVYFb6jfgv/9wLYJxIPOKfMpEajimfOjFWdYwbdBCz0FaTw9wm7CL7lOZCBtVupojWdvWqef4=
+    secure: tFHXAMRSYYFzXfgl3Xmc8nDaKHBEORvydfDkBCzJpBxufbYwW0+DtPZ8O54FVJCNJ9Ud8EmE1QMdFrpI3PJ0ZBecYK3aITB2PQtyiDWgjezmjqHnOXFXefIb1mjo797wo30eDXmgFhI9d/gGbjep4PeMd9Fe6KtpCi8bDGm4fPcBkmC3zemXPNHj2HQfqmdfIVFgUz5wJxNcGGOyHkD2hkmCEX2QqRx/7pS6TPSRx+rBJEXBuwevzGyRs+FI3m38k3bpkI6q7uFOnFnJy86QO2pNhvcoD9Rzama79huGJi/oHFj3dZvaHaRD4Wp96ZLuCobPeqz1sJd7Yofb+u3DJz1eTHkt5tPq35fRJ7ksHaq8GkJL7b7lh78k9riAjWNgmgnj0gFZhkI14YjEaJY9/KvueTZiDQg3G1RWCpYyWiOT7CHUEvEb44aoCPXCdgnOOCkuThwx1bDkc6MmiauhpK6XDT5tSw7Y81BKoaX/unsS40bQ/8a+3zNaPPzLRzeWG+6Bc9X39HyrPyvGU6w1EmEDwSR7pI3RjdQndwxUoiL8uPHSYBQGbXF+Tln8KF/EilDsZNA/kkNuc6/uBNlQnw5lHsRM7dXhb5+KaXusBK8mNVeguBURPWVjJ9mYV89IbStzidu1YnGRiJilKBVF81i1HdK/RAS+4jHGQktZxlU=
 before_script:
 - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
 - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
@@ -22,6 +22,8 @@ after_success:
 - "./prod_dc build"
 - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 - "./prod_dc push"
+before_deploy:
+- 
 deploy:
   provider: elasticbeanstalk
   region: us-east-2

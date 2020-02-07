@@ -22,11 +22,19 @@ travis encrypt \
   --override \
   --org
 
+# expand env variables into template and save to Dockerrun.aws.json
+scripts/template_substitute.py \
+  task/prod/.env \
+  Dockerrun.aws_template.json \
+  Dockerrun.aws.json
+
+
 if [ "$#" == "0" ]; then
   MSG="Update Travis secrets"
 else
   MSG="$@"
 fi
+
 
 git add -A
 git commit -m "$MSG"
