@@ -44,3 +44,16 @@ after_success:
   - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
   # Take the built production images and push to Docker Hub
   - ./prod_dc push
+
+deploy:
+  provider: elasticbeanstalk
+  region: <YOUR-AWS_REGION>
+  app: <YOUR-EB_APP_NAME>
+  env: <YOUR-EB_ENV_NAME>
+  bucket_name: <YOUR-EB_S3_BUCKET_NAME>
+  bucket_path: todo-app
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY

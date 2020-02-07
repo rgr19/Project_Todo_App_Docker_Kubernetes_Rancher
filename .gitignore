@@ -21,3 +21,8 @@ Thumbs.db
 # CUSTOM
 npm_install_failed.txt
 npm_install_success.txt
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

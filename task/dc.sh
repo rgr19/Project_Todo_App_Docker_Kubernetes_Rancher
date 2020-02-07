@@ -2,8 +2,14 @@
 
 # shellcheck disable=SC2164
 
+if [ -z "$WDIR" ]; then
+  echo "[ERROR] env var WDIR can not be EMPTY"
+  exit 1
+fi
+
 if [ ! -d "$WDIR" ]; then
   echo "[ERROR] task/$WDIR do not exist"
+  exit 2
 fi
 
 if [ ! -f "$WDIR/docker-compose.yml" ]; then

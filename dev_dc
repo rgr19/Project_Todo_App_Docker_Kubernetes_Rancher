@@ -3,6 +3,6 @@
 # shellcheck disable=SC2164
 CWD=$PWD
 cd task
-WDIR='dev' ./dc "$@"
+WDIR='dev' ./dc.sh "$@"
 cd $CWD
 
