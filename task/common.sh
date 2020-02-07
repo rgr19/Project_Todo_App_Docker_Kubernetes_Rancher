@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash
 
 echo "[INFO] Source 'common.sh'."
 
@@ -88,8 +88,6 @@ function read_env_variables() {
   # declare -p ENV_HASHMAP # check hashmap content
   hashmap_to_string ENV_HASHMAP _ENV_STRING
 }
-
-
 
 function get_github_branch_current() {
   git rev-parse --abbrev-ref HEAD

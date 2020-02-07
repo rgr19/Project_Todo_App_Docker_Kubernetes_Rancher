@@ -18,6 +18,7 @@ travis encrypt \
   DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID) \
   GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH) \
   GITHUB_USER=$(cat .env/GITHUB_USER) \
+
   --add env.global \
   --override \
   --org
@@ -28,6 +29,8 @@ scripts/template_substitute.py \
   Dockerrun.aws_template.json \
   Dockerrun.aws.json
 
+# update AWS EB env vars
+./prod_eb repenv
 
 if [ "$#" == "0" ]; then
   MSG="Update Travis secrets"
