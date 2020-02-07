@@ -27,10 +27,9 @@ before_install:
 #  - docker-compose --version
 #install:
 
+# One build will be triggered for each line in the env array.
 env:
-  - DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID)
-  - GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH)
-  - GITHUB_USER=$(cat .env/GITHUB_USER)
+  - DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID) GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH) GITHUB_USER=$(cat .env/GITHUB_USER)
 
 # Build development images for test
 before_script:
