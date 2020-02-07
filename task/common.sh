@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 
-echo "SOURCED "
+echo "[INFO] Source 'common.sh'."
 
 function string_to_hashmap() {
   local CHAR='='

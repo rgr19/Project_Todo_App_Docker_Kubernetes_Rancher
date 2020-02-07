@@ -10,7 +10,7 @@ before_install:
 - "./task/setup/install/docker_install.sh"
 env:
   global:
-    secure: lrUEMvOgigwghnYu2UaTLotOCBWcaFOxHrK/MntG4jdmiQAExspcnFaltZ9j79kEA0qfF8h2ZIcrRlRtmJnHdiCyFWezyRNZ3h4QzpcoP5/qqmCxBtwVyxc1CSIihyOp3zKa8tPT87ZTwm00p9FL708djhSyahUm5fqzYdIfTiUMpW9Wk+jHen68+sHxR7RtE8qdTZVjFykjXpTeaHOvi58ScqKbIKIfOdcueq6s0owXCp0HVq6ylTdUTGnf4UU0Yz2LifhouPwB8Oqx0GLE5Blog4awyGy8wztEw5PSeodwjffLyir00Wig1mOEnlkBRAdoK2g5pkXfM8y0Qc6iXsHki+ErrkqIiqXg58qm5fo5VmusynJ4jMguDYLp8Yp+6QZSKtNxl2vHSb9/9c1vu+u9Aa2btmy4wCEt1K/OnG39Nb0MmFeJIg6IJ22YiXp9swLWT4r4NeEKDR3zBOQkt7KImWzoOYrwvoqg96L5H05wZMXizcTLfIuUEykHN774oRElhnumBP7F51B9O3mjwtQK2MIq72Ep6UEGqCRw6gmyyIZadH2eiC8glTh6vCybDS3kFpTio4SndX0EjLIU0iIsKozBn7Gk3keGK35lQMJzuoeso3kSqYbL1m9n5UFagfH8eJZfmjKoPjLBldduGX+U0TY0szhavboFQ8OcuCI=
+    secure: YtdAmVqc6horHMPdzv9xTutugY8MRiLqsr+qS/LlPlKN2KQaMEDtpJjgNkSo2iBe+KSY9YGfSLwUnZ7BCNA/d8RJPik/OjdoIrH24foYX+paL1qG0BkLCGJ6JQPZJIsCE80llpwGr25SPrOHGaReiFGvLUaXGehD1e6yfcvmuOA8dG3XbwNV6hycV43qEcwTu+0MMNGQDGwi5BlGvA40m1owZzLS2W9A68SyOxesSzPAETWQ3AUuZP5gtUl7L/hOyv2W27c0YGfuiE8jfjiNz5CpwVv8wV2YMtosq8b2vFsjtcFBk7bEzW9J9S2LggrJGsLUN/OQV3DjBk5GZiP8KK99x8CQ5mfbJkzr3E7CvOfFDNo3zaRE2w8dhkJlwcNVWlgBNwcYzt4g0Tc+u0lU8sl8TxRMHAYIS9BbvL7nBLbR3o5ql8dBWGuppkk9OlhuSVt8fuNvq/aSOYNGFqOIFnoL4Gmd71OTctCE+q6xEUEoEemVj6odC1RSRQoJuLmiodS8CeSxO2W6fymA3eDsaotOewONaGXeVa/ek6G8aI/jctFId2H/Yafj6lxNpE5sCEs5GR0MS4dAlajqC1ysy/UPms/82GnlcdCkOZxXh6wHkYJu0b+cBc7nH8pvWl+zubMR3/VKlVIgJVoh36aYI2KEcD8NQO5woxUaXIbVD+Y=
 before_script:
 - docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
 - docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
@@ -20,7 +20,7 @@ script:
 - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
 - "./prod_dc build"
-- echo "$DOCKER_HUB_PASSWORD_ENCRYPTED" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 - "./prod_dc push"
 deploy:
   provider: elasticbeanstalk
@@ -31,6 +31,6 @@ deploy:
   bucket_path: todo-app
   on:
     branch: "$GITHUB_BRANCH"
-  access_key_id: "$AWS_KEY_ID_ENCRYPTED"
+  access_key_id: "$AWS_KEY_ID"
   secret_access_key:
-    secure: "$AWS_SECRET_KEY_ENCRYPTED"
+    secure: "$AWS_SECRET_KEY"
