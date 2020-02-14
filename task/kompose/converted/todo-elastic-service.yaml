@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -f docker-compose.override.yml
+      -f docker-compose.limits.yml -f kompose.override.yml --replicas=2 --verbose
+      --out converted
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-elastic
+  name: todo-elastic
+spec:
+  ports:
+  - name: "9200"
+    port: 9200
+    targetPort: 9200
+  - name: "9300"
+    port: 9300
+    targetPort: 9300
+  selector:
+    io.kompose.service: todo-elastic
+status:
+  loadBalancer: {}

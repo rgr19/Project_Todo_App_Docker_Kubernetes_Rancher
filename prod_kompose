@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2164
+CWD=$PWD
+cd task
+WDIR='kompose' ./kompose.sh "$@"
+cd $CWD
+

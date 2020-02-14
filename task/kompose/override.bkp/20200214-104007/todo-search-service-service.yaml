@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -f docker-compose.override.yml
+      -f docker-compose.limits.yml -f kompose.override.yml --replicas=2 --verbose
+      --out converted
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-search-service
+  name: todo-search-service
+spec:
+  ports:
+  - name: "3002"
+    port: 3002
+    targetPort: 3000
+  selector:
+    io.kompose.service: todo-search-service
+status:
+  loadBalancer: {}

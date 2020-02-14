@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -f docker-compose.override.yml
+      -f docker-compose.limits.yml -f kompose.override.yml --replicas=2 --verbose
+      --out converted
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-search-service
+  name: todo-search-service
+spec:
+  replicas: 2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -f docker-compose.override.yml
+          -f docker-compose.limits.yml -f kompose.override.yml --replicas=2 --verbose
+          --out converted
+        kompose.version: 1.19.0 (f63a961c)
+        namespace: todo
+      creationTimestamp: null
+      labels:
+        io.kompose.service: todo-search-service
+    spec:
+      containers:
+      - args:
+        - sh
+        - /home/node/app/start.sh
+        env:
+        - name: ELASTICSEARCH_HOST
+        - name: ELASTICSEARCH_PORT
+        image: /todo-search-service:1.0
+        name: todo-search-service
+        ports:
+        - containerPort: 3000
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,67 @@
+# Use v. 2 as it support resource constraint options
+# (cpu_*, mem_* limits) for non swarm mode in Compose
+# Or use v. 3.7 wit limits
+version: "3.7"
+
+
+services:
+
+  todo-rabbitmq:
+    labels:
+      namespace: todo
+
+  todo-redis:
+    labels:
+      namespace: todo
+
+  todo-postgres:
+    labels:
+      namespace: todo
+
+  todo-elastic:
+    labels:
+      namespace: todo
+
+  todo-cache-ingestion:
+    labels:
+      namespace: todo
+
+  todo-cache-service:
+    labels:
+      namespace: todo
+
+  todo-search-ingestion:
+    labels:
+      namespace: todo
+
+  todo-search-service:
+    labels:
+      namespace: todo
+
+  todo-storage-ingestion:
+    labels:
+      namespace: todo
+
+  todo-storage-service:
+    labels:
+      namespace: todo
+
+  todo-api-gateway:
+    labels:
+      namespace: todo
+
+  todo-view:
+    labels:
+      namespace: todo
+
+  todo-proxy:
+    labels:
+      namespace: todo
+
+volumes:
+  postgres-data:
+    labels:
+      namespace: todo
+  elastic-data:
+    labels:
+      namespace: todo
