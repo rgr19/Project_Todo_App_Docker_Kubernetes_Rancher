@@ -4,15 +4,7 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2086
 
-if [ -z "$WDIR" ]; then
-  echo "[ERROR] env var WDIR can not be EMPTY"
-  exit 1
-fi
 
-if [ ! -d "$WDIR" ]; then
-  echo "[ERROR] task/$WDIR do not exist"
-  exit 2
-fi
 
 # source common functions
 . common.sh
@@ -22,6 +14,10 @@ function set_eb_env() {
   echo "[INFO] env get status..."
   if ! (eb status); then
     envList=$(eb list)
+    if [ -z "$envList" ]; then
+      echo "[ERROR] EB Env List is empty"
+      exit 1
+    fi
     echo "[INFO] env not set, setting ${envList[0]}"
     eb use ${envList[0]}
     echo "[INFO] env get status..."
@@ -32,7 +28,12 @@ function set_eb_env() {
 
 function upload_env() {
   local ENV_STRING=""
-  read_env_variables ENV_STRING ".env.dc .env.aws" "../../.env/*"
+  local BUILD_TYPE=""
+
+  read_env_variables ENV_STRING ".env.dc .env.aws" "../../.envfiles/*"
+  guess_build_type BUILD_TYPE $WDIR
+
+  ENV_STRING="BUILD_TYPE=$BUILD_TYPE $ENV_STRING"
 
   echo "[INFO] will set env variables..."
   for pair in $ENV_STRING; do
@@ -43,11 +44,13 @@ function upload_env() {
   echo "[INFO] update done."
 }
 
-cd "$WDIR"
 echo "#####################################################################"
 echo "##### [INFO] Executing ElasticBeanstalk from inside '$WDIR' directory"
 echo "#####################################################################"
-
+check_wdir
+symlink_dev_files
+symlink_prod_files
+cd "$WDIR"
 ARGIN="$@"
 set_eb_env
 

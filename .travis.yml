@@ -19,9 +19,9 @@ script:
   --watch=false --no-progress
 - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
-- "./prod_dc build"
+- "./prod_dockercompose build"
 - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-- "./prod_dc push"
+- "./prod_dockercompose push"
 before_deploy:
 - 
 deploy:

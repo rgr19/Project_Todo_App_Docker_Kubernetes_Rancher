@@ -6,30 +6,30 @@
 . task/common.sh
 
 # save current branch name
-touch .env/{GITHUB_BRANCH,GITHUB_USER}
-get_github_branch_current >.env/GITHUB_BRANCH
-get_git_user_name >.env/GITHUB_USER
+touch .envfiles/{GITHUB_BRANCH,GITHUB_USER}
+get_github_branch_current >.envfiles/GITHUB_BRANCH
+get_git_user_name >.envfiles/GITHUB_USER
 
 # encrypt secret keys
 travis encrypt \
   AWS_SECRET_KEY=$(cat .secret/aws/AWS_SECRET_KEY) \
   AWS_KEY_ID=$(cat .secret/aws/AWS_KEY_ID) \
   DOCKER_HUB_PASSWORD=$(cat .secret/docker/DOCKER_HUB_PASSWORD) \
-  DOCKER_HUB_ID=$(cat .env/DOCKER_HUB_ID) \
-  GITHUB_BRANCH=$(cat .env/GITHUB_BRANCH) \
-  GITHUB_USER=$(cat .env/GITHUB_USER) \
+  DOCKER_HUB_ID=$(cat .envfiles/DOCKER_HUB_ID) \
+  GITHUB_BRANCH=$(cat .envfiles/GITHUB_BRANCH) \
+  GITHUB_USER=$(cat .envfiles/GITHUB_USER) \
   --add env.global \
   --override \
   --org
 
 # expand env variables into template and save to Dockerrun.aws.json
 scripts/template_substitute.py \
-  task/prod/.env \
+  task/prod/.envfiles \
   Dockerrun.aws_template.json \
   Dockerrun.aws.json
 
 # update AWS EB env vars
-./prod_eb repenv
+./prod_aws repenv
 
 if [ "$#" == "0" ]; then
   MSG="Update Travis secrets"

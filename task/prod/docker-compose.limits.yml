@@ -1,0 +1,110 @@
+# Use v. 2 as it support resource constraint options
+# (cpu_*, mem_* limits) for non swarm mode in Compose
+# Or use v. 3.7 wit limits
+version: "3.7"
+
+
+services:
+  todo-rabbitmq:
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 150M
+
+  todo-redis:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 200M
+
+  todo-postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 400M
+
+  todo-elastic:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 400M
+
+  todo-cache-ingestion:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-cache-service:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-search-ingestion:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-search-service:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-storage-ingestion:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-storage-service:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-api-gateway:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+
+  todo-view:
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 650M
+
+  todo-proxy:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M

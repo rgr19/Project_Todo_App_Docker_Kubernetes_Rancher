@@ -3,6 +3,6 @@
 # shellcheck disable=SC2164
 CWD=$PWD
 cd task
-WDIR='dev' ./eb.sh "$@"
+WDIR='prod' ./docker-compose.sh "$@"
 cd $CWD
 
