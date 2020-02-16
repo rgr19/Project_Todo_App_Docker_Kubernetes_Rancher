@@ -10,10 +10,11 @@ before_install:
 - "./task/setup/install/docker_install.sh"
 env:
   global:
-    secure: bbKYspckcCImps5hqf5KRNBnwac3pTdY3s0nL6zJKuozy1rLfDsAhSD8C8P/Hw/Y8BVxUCQT+iHs2pKJYoGAZKDF8SJK0NCJ9aIMtq9VACon4V/5wxqxPcRr064RW9YdbefVF6unkukzCCzab9fxdVWCCyqZFxbU8dEBniSiZ2nXJBdtHkriBBWezGOe7TgHHscc8FYj1+u4dqoLX0TzTjKRkry+s8Dcb07ohzv/3G1cfPZf4e9joEHdOMsyIkHV6uKKL5cJC/H2zqR9qsWPjs8Y55DwpxJLdBb6k89ZkB6Fkjm8REOjpIl7lGTwbASZirY1NkDcSrnScP7kVL5RbE22EkueYUfgmTJ9erYUa9a8Ol65uTM6mlrTQiJOA+4lOWnzoVgI8QBVZtnRxFZvm3MMLaO6ALj7KBlid/Qb++Y6JlukBLBM4f3a0RZS3c4Kyxne6QSdlwTZYI4vXUlFzWR6mPhM9fvYT2lMhY8LIj7JDzHnRh0PlWu54CEE8uRmPrEKCt2EvqDkG1xAeQmtbtxXngSU4Z/N90YCJxTT6BZhqhrWR9B3ThiMcuRxKDV9Q/YDURxj60g8M+FmF/5MoZ3CN9tRjr5hkvKiG0fxPtyNGTPe9yrPhiY8LFBBeBgp5wkLSCXwUwHq+FW3fBcfkTiiDPr2IRERi+NobxJYoTA=
+    secure: ib9DnWNcl5X0FoxodpxOLRNaB7U/uLl1QLjlvPQFge63lmHsIifDdzgzijhafJf8M9I7ldgM3yimLOshy7Loxc/0qYS5xRjqPRo0DGvzO5Nprnd2RYiG1si/TjEk9esie/fHGL87sVAeYXxu9lOejJv5H3R6z8xqntLwKBk/K/SNsuXv97XZfXK+x7rZOcQ5RZSbqHBs2X5bKN2N53FuCZLiHlHUURZeKdlICz8BwybpmbBfTRlFBKrJ3ljQV5HOHjxjRRBpoBVuk3J7qis0nqNEGTYWblNkW86u8e3d/ZoORupcTiUdfjl/ax6PbXvW8q+Z12z9QarMK4Mzbww+Ws+uti3lg8S2sbQtfJluD6jKnCk3c5CPk751pHW3wO870hL04KS7T3kBa671HCRit8eyzXoQ51Q8ZoGVMICFs8Pp5POiOmHp/Kuk/io5SG3GiufbEy2djmZ6sS1Es8+MOCCGf88E2qbHfDzWcutYFrr9AWDoYdXMx9CfmGcdq0XPcx4xCBqDNiOTyveTD7ckE1gynpE2OnqklHwPgWCG/1WLkrwcwFl+rzWryYAR8IdT3Kt10r/p2A9sE3mRzV4qyDE1EZQbsnqglJBYEqjaWzRQO/M7SI7hh0f17Rm6iHfBZlmT8l5892uH2/VY7euMuA1bMj+5Bv8s1ev/R/M9yKI=
 before_script:
-- docker build ./src/todo-view -f ./src/todo-view/Dockerfile.${BUILD_TYPE} -t $DOCKER_HUB_ID/todo-view-test
-- docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.${BUILD_TYPE} -t $DOCKER_HUB_ID/todo-cache-service-test
+- docker build ./src/todo-view -f ./src/todo-view/Dockerfile.$BUILD_TYPE -t $DOCKER_HUB_ID/todo-view-test
+- docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.$BUILD_TYPE
+  -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
 - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
   --watch=false --no-progress

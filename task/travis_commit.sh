@@ -2,14 +2,14 @@
 # shellcheck disable=SC2046
 # shellcheck disable=SC2199
 # shellcheck disable=SC2124
+# shellcheck disable=SC2086
 
 # source common functions
 . task/common.sh
 
 echo "[INFO] Executing Travis CI Wrapper"
 
-CWD=$PWD
-TASK="NONE"
+TASK="PROD"
 MSG="Update Travis secrets"
 if [ "$#" -gt 0 ]; then
   if [[ "$@" == "TASK"* ]]; then
@@ -72,6 +72,7 @@ SECRETS="
   DOCKER_HUB_ID=$(cat .envfiles/DOCKER_HUB_ID)
   GITHUB_BRANCH=$(cat .envfiles/GITHUB_BRANCH)
   GITHUB_USER=$(cat .envfiles/GITHUB_USER)
+  BUILD_TYPE=prod
 "
 AWS_SECRETS="
   AWS_SECRET_KEY=$(cat .secretfiles/aws/AWS_SECRET_KEY)
@@ -95,8 +96,12 @@ if [[ "$TASK" == "AWS" ]]; then
   echo "     | $TASK"
   ./prod_aws UPLOAD_ENV
 
-elif [[ "$TASK" == "NONE" ]]; then
-  echo "     | NONE"
+elif [[ "$TASK" == "K8S" ]]; then
+  echo "     | K8S"
+  ./prod_k8s
+
+elif [[ "$TASK" == "PROD" ]]; then
+  echo "     | PROD"
   echo "[INFO] Nothing todo."
 
 else

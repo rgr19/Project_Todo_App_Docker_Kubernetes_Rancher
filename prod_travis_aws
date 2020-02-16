@@ -1,0 +1,2 @@
+#!/bin/bash -e
+CWD=$PWD ./task/travis_commit.sh  TASK AWS $@
