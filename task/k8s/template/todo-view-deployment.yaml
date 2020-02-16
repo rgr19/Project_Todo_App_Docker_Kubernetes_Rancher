@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-view
+  labels:
+    todo-app-deployment: todo-view
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      todo-app-pod: todo-view
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-view
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: todo-view
+          image: ${DOCKER_HUB_ID}/${VIEW_IMAGE}
+          ports:
+            - containerPort: ${VIEW_TARGET_PORT_DEV}
+            - containerPort: ${VIEW_TARGET_PORT_HTTP}
+          resources:
+            limits:
+              memory: ${VIEW_LIMITS_MEMORY}

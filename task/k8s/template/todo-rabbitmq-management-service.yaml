@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-rabbitmq-management
+  labels:
+    todo-app-service: todo-rabbitmq-management
+spec:
+  type: NodePort
+  selector:
+    todo-app-pod: todo-rabbitmq
+  ports:
+  - name: ${RABBITMQ_PORT_HTTP_NAME}
+    port: ${RABBITMQ_PORT_HTTP}
+    targetPort: ${RABBITMQ_TARGET_PORT_HTTP}

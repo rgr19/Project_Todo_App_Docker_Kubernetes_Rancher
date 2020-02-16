@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2164
+(
+CWD=$PWD
+cd task
+CWD=$CWD WDIR='k8s' ./k8s.sh "$@"
+)
+

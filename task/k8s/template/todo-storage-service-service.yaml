@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-storage-service
+  labels:
+    todo-app-service: todo-storage-service
+spec:
+  type: ClusterIP
+  selector:
+    todo-app-pod: todo-storage-service
+  ports:
+    - name: ${STORAGE_SERVICE_PORT_NAME}
+      port: ${STORAGE_SERVICE_PORT}
+      targetPort: ${STORAGE_SERVICE_TARGET_PORT}

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-elastic
+  labels:
+    todo-app-service: todo-elastic
+spec:
+  type: ClusterIP
+  selector:
+    todo-app-pod: todo-elastic
+  ports:
+  - name: ${ELASTICSEARCH_PORT_HTTP_NAME}
+    port: ${ELASTICSEARCH_PORT_HTTP}
+    targetPort: ${ELASTICSEARCH_TARGET_PORT_HTTP}
+  - name: ${ELASTICSEARCH_PORT_TRANSPORT_NAME}
+    port: ${ELASTICSEARCH_PORT_TRANSPORT}
+    targetPort: ${ELASTICSEARCH_TARGET_PORT_TRANSPORT}

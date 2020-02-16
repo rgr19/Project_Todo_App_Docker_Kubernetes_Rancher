@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-rabbitmq
+  labels:
+    todo-app-deployment: todo-rabbitmq
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        todo-app-pod: todo-rabbitmq
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-rabbitmq
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: todo-rabbitmq
+          image: ${RABBITMQ_IMAGE}
+          envFrom:
+            - configMapRef:
+                name: todo-config
+          env:
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+              secretKeyRef:
+                name: todo-secret
+                key: RABBITMQ_DEFAULT_PASS
+          ports:
+          - name: ${RABBITMQ_PORT_HTTP_NAME}
+            protocol: TCP
+            containerPort: ${RABBITMQ_TARGET_PORT_HTTP}
+          - name: ${RABBITMQ_PORT_AMQP_NAME}
+            protocol: TCP
+            containerPort: ${RABBITMQ_TARGET_PORT_AMQP}
+          resources:
+            limits:
+              memory: ${RABBITMQ_LIMITS_MEMORY}
+          livenessProbe:
+            exec:
+              command: ["rabbitmqctl", "status"]
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["rabbitmqctl", "status"]
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            timeoutSeconds: 10
+
