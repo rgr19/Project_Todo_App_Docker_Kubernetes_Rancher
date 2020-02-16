@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 # shellcheck disable=SC2164
+(
 CWD=$PWD
 cd task
-WDIR='prod' ./elastic-beanstalk.sh "$@"
-cd $CWD
+CWD=$CWD WDIR='aws' ./aws.sh "$@"
+)
 

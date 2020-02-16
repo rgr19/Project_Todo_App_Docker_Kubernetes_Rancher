@@ -1,0 +1,304 @@
+services:
+  todo-api-gateway:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-api-gateway
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    command: sh /home/node/app/start.sh
+    container_name: todo-api-gateway
+    depends_on:
+    - todo-cache-ingestion
+    - todo-cache-service
+    - todo-rabbitmq
+    - todo-search-ingestion
+    - todo-search-service
+    - todo-storage-ingestion
+    - todo-storage-service
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      CACHE_SERVICE_URL: http://todo-cache-service:3000
+      RABBITMQ_URL: amqp://todo:todo1234@todo-rabbitmq
+      SEARCH_SERVICE_URL: http://todo-search-service:3000
+      STORAGE_SERVICE_URL: http://todo-storage-service:3000
+    image: onceawaken/todo-api-gateway:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 3000
+      target: 3000
+  todo-cache-ingestion:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-cache-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    command: sh /home/node/app/start.sh
+    container_name: todo-cache-ingestion
+    depends_on:
+    - todo-rabbitmq
+    - todo-redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      RABBITMQ_URL: amqp://todo:todo1234@todo-rabbitmq
+      REDIS_HOST: todo-redis
+      REDIS_PORT: '6379'
+      STORAGE_SERVICE_URL: http://todo-storage-service:3000
+    image: onceawaken/todo-cache-ingestion:1.0
+    labels:
+      namespace: todo
+  todo-cache-service:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-cache-service
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    container_name: todo-cache-service
+    depends_on:
+    - todo-redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      REDIS_HOST: todo-redis
+      REDIS_PORT: '6379'
+    image: onceawaken/todo-cache-service:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 3001
+      target: 3000
+  todo-elastic:
+    container_name: todo-elastic
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 400M
+    environment:
+      discovery.type: single-node
+    image: elasticsearch:6.6.1
+    labels:
+      namespace: todo
+    ports:
+    - published: 9200
+      target: 9200
+    - published: 9300
+      target: 9300
+    volumes:
+    - elastic-data:/usr/share/elasticsearch/data:rw
+  todo-postgres:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-postgres
+      dockerfile: Dockerfile.prod
+    container_name: todo-postgres
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 400M
+    healthcheck:
+      interval: 5s
+      retries: 10
+      test:
+      - CMD-SHELL
+      - pg_isready --username todo
+      timeout: 3m
+    image: onceawaken/todo-postgres:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 5432
+      target: 5432
+    volumes:
+    - postgres-data:/var/lib/postgresql/data:rw
+  todo-proxy:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-proxy
+      dockerfile: Dockerfile.prod
+    container_name: todo-proxy
+    depends_on:
+    - todo-api-gateway
+    - todo-view
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    image: onceawaken/todo-proxy:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 8080
+      target: 80
+  todo-rabbitmq:
+    container_name: todo-rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 150M
+    environment:
+      RABBITMQ_DEFAULT_PASS: todo1234
+      RABBITMQ_DEFAULT_USER: todo
+    image: rabbitmq:3.7.13-management
+    labels:
+      namespace: todo
+    ports:
+    - published: 5672
+      target: 5672
+    - published: 8081
+      target: 15672
+  todo-redis:
+    container_name: todo-redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 200M
+    image: redis:5.0.3
+    labels:
+      namespace: todo
+    ports:
+    - published: 6379
+      target: 6379
+  todo-search-ingestion:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-search-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    command: sh /home/node/app/start.sh
+    container_name: todo-search-ingestion
+    depends_on:
+    - todo-elastic
+    - todo-rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      ELASTICSEARCH_HOST: todo-elastic
+      ELASTICSEARCH_PORT: '9200'
+      RABBITMQ_URL: amqp://todo:todo1234@todo-rabbitmq
+    image: onceawaken/todo-search-ingestion:1.0
+    labels:
+      namespace: todo
+  todo-search-service:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-search-service
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    command: sh /home/node/app/start.sh
+    container_name: todo-search-service
+    depends_on:
+    - todo-elastic
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      ELASTICSEARCH_HOST: todo-elastic
+      ELASTICSEARCH_PORT: '9200'
+    image: onceawaken/todo-search-service:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 3002
+      target: 3000
+  todo-storage-ingestion:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-storage-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    command: sh /home/node/app/start.sh
+    container_name: todo-storage-ingestion
+    depends_on:
+    - todo-postgres
+    - todo-rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      POSTGRES_DATABASE: todo
+      POSTGRES_HOST: todo-postgres
+      POSTGRES_PASSWORD: todo1234
+      POSTGRES_PORT: '5432'
+      POSTGRES_USER: todo
+      RABBITMQ_URL: amqp://todo:todo1234@todo-rabbitmq
+    image: onceawaken/todo-storage-ingestion:1.0
+    labels:
+      namespace: todo
+  todo-storage-service:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-storage-service
+      dockerfile: ../common/Dockerfile.nodejs.prod
+    container_name: todo-storage-service
+    depends_on:
+    - todo-postgres
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 100M
+    environment:
+      POSTGRES_DATABASE: todo
+      POSTGRES_HOST: todo-postgres
+      POSTGRES_PASSWORD: todo1234
+      POSTGRES_PORT: '5432'
+      POSTGRES_USER: todo
+    image: onceawaken/todo-storage-service:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 3003
+      target: 3000
+  todo-view:
+    build:
+      context: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-view
+      dockerfile: Dockerfile.prod
+    container_name: todo-view
+    depends_on:
+    - todo-api-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 650M
+    image: onceawaken/todo-view:1.0
+    labels:
+      namespace: todo
+    ports:
+    - published: 4200
+      target: 4200
+    - published: 4201
+      target: 8080
+    volumes:
+    - /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/src/todo-view:/usr/src/app:rw
+    - /usr/src/app/node_modules
+version: '3.7'
+volumes:
+  elastic-data:
+    labels:
+      namespace: todo
+  postgres-data:
+    labels:
+      namespace: todo
+

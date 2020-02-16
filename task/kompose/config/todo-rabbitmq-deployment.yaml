@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+      --out config --verbose
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-rabbitmq
+  name: todo-rabbitmq
+spec:
+  replicas: 2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+          --out config --verbose
+        kompose.version: 1.19.0 (f63a961c)
+        namespace: todo
+      creationTimestamp: null
+      labels:
+        io.kompose.service: todo-rabbitmq
+    spec:
+      containers:
+      - env:
+        - name: RABBITMQ_DEFAULT_PASS
+          value: todo1234
+        - name: RABBITMQ_DEFAULT_USER
+          value: todo
+        image: rabbitmq:3.7.13-management
+        name: todo-rabbitmq
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+        resources:
+          limits:
+            memory: "209715200"
+          requests:
+            memory: "157286400"
+      restartPolicy: Always
+status: {}

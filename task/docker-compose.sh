@@ -6,15 +6,14 @@
 
 . common.sh
 
-
 echo "###################################################################"
 echo "##### [INFO] Executing docker-compose from inside '$WDIR' directory"
 echo "###################################################################"
-check_wdir
+check_project_env
 symlink_dev_files
 cd "$WDIR"
-reload_env  ".env.dc" \
-            "../../.envfiles/*"
+reload_env ".env.dc" "../../.envfiles/"*
+reload_nested_env ".env.dc" ".env"
 
 ARGINPUT="$@"
 CONFIG_YAMLS="

@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+      --out config --verbose
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-redis
+  name: todo-redis
+spec:
+  replicas: 2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+          --out config --verbose
+        kompose.version: 1.19.0 (f63a961c)
+        namespace: todo
+      creationTimestamp: null
+      labels:
+        io.kompose.service: todo-redis
+    spec:
+      containers:
+      - image: redis:5.0.3
+        name: todo-redis
+        ports:
+        - containerPort: 6379
+        resources:
+          limits:
+            memory: "268435456"
+          requests:
+            memory: "209715200"
+      restartPolicy: Always
+status: {}

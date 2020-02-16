@@ -1,0 +1,14 @@
+before_deploy:
+- 
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2
+  app: Todo App
+  env: todo-app-env
+  bucket_name: elasticbeanstalk-us-east-2-277466026916
+  bucket_path: todo-app
+  on:
+    branch: "$GITHUB_BRANCH"
+  access_key_id: "$AWS_KEY_ID"
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"

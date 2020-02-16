@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # shellcheck disable=SC2164
-CWD=$PWD
+(CWD=$PWD
 cd task
-WDIR='dev' ./docker-compose.sh "$@"
-cd $CWD
-
+CWD=$CWD WDIR='docker_dev' ./docker-compose.sh "$@"
+)

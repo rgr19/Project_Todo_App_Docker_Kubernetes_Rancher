@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+      --out config --verbose
+    kompose.version: 1.19.0 (f63a961c)
+    namespace: todo
+  creationTimestamp: null
+  labels:
+    io.kompose.service: todo-search-ingestion
+  name: todo-search-ingestion
+spec:
+  replicas: 2
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+          --out config --verbose
+        kompose.version: 1.19.0 (f63a961c)
+        namespace: todo
+      creationTimestamp: null
+      labels:
+        io.kompose.service: todo-search-ingestion
+    spec:
+      containers:
+      - args:
+        - sh
+        - /home/node/app/start.sh
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: todo-elastic
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: RABBITMQ_URL
+          value: amqp://todo:todo1234@todo-rabbitmq
+        image: onceawaken/todo-search-ingestion:1.0
+        name: todo-search-ingestion
+        resources:
+          limits:
+            memory: "134217728"
+          requests:
+            memory: "104857600"
+      restartPolicy: Always
+status: {}
