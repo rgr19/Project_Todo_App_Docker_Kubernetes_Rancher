@@ -29,6 +29,7 @@ cd "$WDIR"
 reload_env ".env.dc .env.k8s" "../../.envfiles/"*
 reload_nested_env ".env.dc" ".env"
 
+rm config/*.yaml -Rf
 expand_template_yamls "template" "config"
 
 CONFIG_YAMLS="
@@ -39,11 +40,11 @@ todo-secret.yaml
 
 PV_YAMLS="
 elastic-data-persistentvolume.yaml
-elastic-data-persistentvolumeclaim.yaml
+postgres-data-persistentvolume.yaml
 "
 
 PVC_YAMLS="
-postgres-data-persistentvolume.yaml
+elastic-data-persistentvolumeclaim.yaml
 postgres-data-persistentvolumeclaim.yaml
 "
 
@@ -102,12 +103,13 @@ if [[ "$MODE" == *"FRESH"* ]]; then
   print_ntimes "#" 100
   echo "[INFO] FRESH: delete NAMESPACE todo, delete PVs:"
   kubectl delete namespace todo
-  kubectl delete pv elastic-data-pv
-  kubectl delete pv postgres-data-pv
+  kubectl delete pv elastic-data-pv || true
+  kubectl delete pv postgres-data-pv || true
 fi
 
 kubectl_apply_config $CONFIG_YAMLS
-kubectl_apply_pv_pvc $PV_YAMLS $PVC_YAMLS
+#kubectl_apply_pv $PV_YAMLS
+kubectl_apply_pvc $PVC_YAMLS
 kubectl_apply_pods $DEPLOYMENT_STATEFUL_YAMLS
 kubectl_apply_pods $DEPLOYMENT_TODO_SERVICES_YAMLS
 kubectl_apply_pods $DEPLOYMENT_RABBITMQ_YAMLS

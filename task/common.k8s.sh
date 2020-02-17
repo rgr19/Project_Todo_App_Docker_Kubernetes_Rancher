@@ -37,11 +37,17 @@ function kubectl_watch_pods_svc_deploy() {
   kubect_watch_pods
 }
 
-function kubectl_watch_pv_pvc() {
+function kubectl_watch_pv() {
   set +e
   print_ntimes "#" 100
   echo "[INFO] GET PV in watch mode. CTRL+C to continue."
   kubectl get pv -w
+  set -e
+}
+
+
+function kubectl_watch_pvc() {
+  set +e
   print_ntimes "#" 100
   echo "[INFO] GET PVC in watch mode. CTRL+C to continue."
   kubectl get pvc -w --namespace todo
@@ -73,11 +79,19 @@ function kubectl_apply_config() {
   fi
 }
 
-function kubectl_apply_pv_pvc() {
+function kubectl_apply_pv() {
   kubectl_apply_list $@
   if [[ "$TASK" == *"V"* ]]; then
     if [[ "$TASK" == *"WAIT"* ]]; then
-      kubectl_watch_pv_pvc
+      kubectl_watch_pv
+    fi
+  fi
+}
+function kubectl_apply_pvc() {
+  kubectl_apply_list $@
+  if [[ "$TASK" == *"V"* ]]; then
+    if [[ "$TASK" == *"WAIT"* ]]; then
+      kubectl_watch_pvc
     fi
   fi
 }
