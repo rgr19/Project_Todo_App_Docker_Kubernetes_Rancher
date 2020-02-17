@@ -38,6 +38,10 @@ TEMPLATE_TRAVIS_AWS_YML=task/aws/template/.travis.aws.yml
 TRAVIS_YML=.travis.yml
 
 echo "[INFO] Get $TRAVIS_YML from templates for TASK:"
+
+  TRAVIS_TEMPLATES="
+      $TEMPLATE_TRAVIS_BASE_YML
+  "
 if [[ "$TASK" == "AWS" ]]; then
   echo "     | AWS"
   if [ -f $TRAVIS_YML ]; then
@@ -46,14 +50,10 @@ if [[ "$TASK" == "AWS" ]]; then
   fi
 
   TRAVIS_TEMPLATES="
-      $TEMPLATE_TRAVIS_BASE_YML
+     $TRAVIS_TEMPLATES
       $TEMPLATE_TRAVIS_AWS_YML
   "
 
-else
-  TRAVIS_TEMPLATES="
-      $TEMPLATE_TRAVIS_BASE_YML
-  "
 fi
 
 if [ -f $TRAVIS_YML ]; then
@@ -112,3 +112,5 @@ fi
 git add -A
 git commit -m "$MSG"
 git push origin $(get_github_branch_current)
+
+echo "[WARN] Do not forget to test with TRAVIS on Dockerfile.dev IMAGES."
