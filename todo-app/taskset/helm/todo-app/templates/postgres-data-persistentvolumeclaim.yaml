@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: postgres-data-pvc
+spec:
+  #  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.BACKEND.STATEFUL.POSTGRES.PV.STORAGE }}

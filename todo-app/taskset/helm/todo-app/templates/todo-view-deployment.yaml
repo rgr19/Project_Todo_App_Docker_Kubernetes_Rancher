@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-view
+  labels:
+    todo-app-deployment: todo-view
+spec:
+  replicas: {{ .Values.FRONTEND.VIEW.REPLICAS }}
+  selector:
+    matchLabels:
+      todo-app-pod: todo-view
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-view
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: todo-view
+          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-view:{{ .Values.FRONTEND.VIEW.IMAGE.TAG }}
+          imagePullPolicy: {{ .Values.FRONTEND.VIEW.IMAGE.PULLPOLICY }}
+          envFrom:
+            - configMapRef:
+                name: todo-config
+          ports:
+            - containerPort: {{ .Values.FRONTEND.VIEW.PORT.TARGET.DEV }}
+            - containerPort: {{ .Values.FRONTEND.VIEW.PORT.TARGET.HTTP }}
+          resources:
+            limits:
+              memory: {{ .Values.FRONTEND.VIEW.MEMORY }}

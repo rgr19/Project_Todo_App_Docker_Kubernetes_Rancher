@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC2164
+(
+CWD=$PWD
+cd taskset
+CWD=$CWD WDIR='helm' ./helm.sh "$@"
+)
+

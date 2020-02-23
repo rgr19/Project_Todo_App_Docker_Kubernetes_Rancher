@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ${NAMESPACE}
+  name: todo-proxy
+  labels:
+    todo-app-deployment: todo-proxy
+spec:
+  replicas: 2
+  selector:
+      matchLabels:
+        todo-app-pod: todo-proxy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-proxy
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: todo-proxy
+        image: {{ .Values.DOCKER_HUB_ID }}/${PROXY_IMAGE}
+        ports:
+        - containerPort: ${PROXY_TARGET_PORT}
+        resources:
+          limits:
+            memory: ${PROXY_LIMITS_MEMORY}

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-search-service
+  labels:
+    todo-app-deployment: todo-search-service
+spec:
+  replicas: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.REPLICAS }}
+  selector:
+      matchLabels:
+        todo-app-pod: todo-search-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-search-service
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: init-elastic
+        image: busybox
+        command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+      containers:
+      - name: todo-search-service
+        image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-service:{{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.TAG }}
+        imagePullPolicy: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.PULLPOLICY }}
+        envFrom:
+          - configMapRef:
+              name: todo-config
+        ports:
+        - containerPort: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.PORT.TARGET }}
+        resources:
+          limits:
+            memory: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.MEMORY }}

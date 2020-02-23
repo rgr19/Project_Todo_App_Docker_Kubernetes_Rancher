@@ -1,0 +1,34 @@
+version: "2.2"
+
+services:
+  todo-postgres:
+    image: onceawaken/todo-postgres:1.0
+  todo-cache-ingestion:
+    image: onceawaken/todo-cache-ingestion:1.0
+    #we are no longer executing by root, but with user node
+    command: sh /home/node/app/start.sh
+  todo-cache-service:
+    image: onceawaken/todo-cache-service:1.0
+  todo-search-ingestion:
+    image: onceawaken/todo-search-ingestion:1.0
+    command: sh /home/node/app/start.sh
+  todo-search-service:
+    image: onceawaken/todo-search-service:1.0
+    command: sh /home/node/app/start.sh
+  todo-storage-ingestion:
+    image: onceawaken/todo-storage-ingestion:1.0
+    command: sh /home/node/app/start.sh
+  todo-storage-service:
+    image: onceawaken/todo-storage-service:1.0
+  todo-api-gateway:
+    image: onceawaken/todo-api-gateway:1.0
+    command: sh /home/node/app/start.sh
+  todo-view:
+    image: onceawaken/todo-view:1.0
+    # dc is appending to array, not overriding it,
+    # so we can not use 4200 again
+    ports:
+      - 4201:8080 # to match todo-view/custom.nginx
+  todo-proxy:
+    image: onceawaken/todo-proxy:1.0
+

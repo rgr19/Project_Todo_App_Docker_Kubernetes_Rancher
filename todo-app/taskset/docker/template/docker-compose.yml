@@ -1,0 +1,207 @@
+version: "VARS_DOCKER_COMPOSE_VERSION"
+
+services:
+  todo-rabbitmq:
+    container_name: todo-rabbitmq
+    image: rabbitmq:${BACKEND_STATELESS_RABBITMQ_IMAGE_TAG}
+    ports:
+      - ${BACKEND_STATELESS_RABBITMQ_PORT_CLUSTER_AMQP}:${BACKEND_STATELESS_RABBITMQ_PORT_TARGET_AMQP}
+      - 8081:${BACKEND_STATELESS_RABBITMQ_PORT_TARGET_HTTP}
+    environment:
+      - RABBITMQ_DEFAULT_USER=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_PASS}
+
+  todo-redis:
+    container_name: todo-redis
+    image: redis:${BACKEND_STATEFUL_REDIS_IMAGE_TAG}
+    ports:
+      - ${BACKEND_STATEFUL_REDIS_PORT_CLUSTER}:${BACKEND_STATEFUL_REDIS_PORT_CLUSTER}
+
+  todo-postgres:
+    container_name: todo-postgres
+    build:
+      context: ../../../src/todo-postgres
+      dockerfile: Dockerfile.${VARS_BUILD_TYPE}
+    image: todo-postgres:dev
+    ports:
+      - ${BACKEND_STATEFUL_POSTGRES_PORT_CLUSTER}:${BACKEND_STATEFUL_POSTGRES_PORT_CLUSTER}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username ${BACKEND_STATEFUL_POSTGRES_SECRETS_USER}" ]
+      interval: 5s
+      timeout: 180s
+      retries: 10
+    environment:
+      - POSTGRES_HOST=${BACKEND_STATEFUL_POSTGRES_HOST}
+      - POSTGRES_PORT=${BACKEND_STATEFUL_POSTGRES_PORT_CLUSTER}
+      - POSTGRES_DB=${BACKEND_STATEFUL_POSTGRES_SECRETS_DB}
+      - POSTGRES_USER=${BACKEND_STATEFUL_POSTGRES_SECRETS_USER}
+      - POSTGRES_PASSWORD=${BACKEND_STATEFUL_POSTGRES_SECRETS_PASSWORD}
+
+  todo-elastic:
+    container_name: todo-elastic
+    image: elasticsearch:${BACKEND_STATEFUL_ELASTICSEARCH_IMAGE_TAG}
+    ports:
+      - ${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_HTTP}:${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_HTTP}
+      - ${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_TRANSPORT}:${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_TRANSPORT}
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+
+  todo-cache-ingestion:
+    container_name: todo-cache-ingestion
+    build:
+      context: ../../../src/todo-cache-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-cache-ingestion:dev
+    command: sh /app/start.sh
+    environment:
+      - REDIS_HOST=${BACKEND_STATEFUL_REDIS_HOST}
+      - REDIS_PORT=${BACKEND_STATEFUL_REDIS_PORT_CLUSTER}
+      - RABBITMQ_DEFAULT_USER=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_PASS}
+      - RABBITMQ_URL=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_URL}
+      - STORAGE_SERVICE_URL=${BACKEND_STATELESS_STORAGE_SERVICE_URL}
+    depends_on:
+      - todo-redis
+      - todo-rabbitmq
+
+  todo-cache-service:
+    container_name: todo-cache-service
+    build:
+      context: ../../../src/todo-cache-service
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-cache-service:dev
+    ports:
+      - 3001:${ROUTING_APIGATEWAY_PORT_TARGET}
+    environment:
+      - REDIS_HOST=${BACKEND_STATEFUL_REDIS_HOST}
+      - REDIS_PORT=${BACKEND_STATEFUL_REDIS_PORT_CLUSTER}
+    depends_on:
+      - todo-redis
+
+  todo-search-ingestion:
+    container_name: todo-search-ingestion
+    build:
+      context: ../../../src/todo-search-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-search-ingestion:dev
+    command: sh /app/start.sh
+    environment:
+      - ELASTICSEARCH_HOST=${BACKEND_STATEFUL_ELASTICSEARCH_HOST}
+      - ELASTICSEARCH_PORT=${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_HTTP}
+      - RABBITMQ_URL=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_URL}
+      - RABBITMQ_DEFAULT_USER=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_PASS}
+    depends_on:
+      - todo-elastic
+      - todo-rabbitmq
+
+  todo-search-service:
+    container_name: todo-search-service
+    build:
+      context: ../../../src/todo-search-service
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-search-service:dev
+    command: sh /app/start.sh
+    ports:
+      - 3002:${ROUTING_APIGATEWAY_PORT_TARGET}
+    environment:
+      - ELASTICSEARCH_HOST=${BACKEND_STATEFUL_ELASTICSEARCH_HOST}
+      - ELASTICSEARCH_PORT=${BACKEND_STATEFUL_ELASTICSEARCH_PORT_CLUSTER_HTTP}
+    depends_on:
+      - todo-elastic
+
+  todo-storage-ingestion:
+    container_name: todo-storage-ingestion
+    build:
+      context: ../../../src/todo-storage-ingestion
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-storage-ingestion:dev
+    command: sh /app/start.sh
+    environment:
+      - POSTGRES_HOST=${BACKEND_STATEFUL_POSTGRES_HOST}
+      - POSTGRES_PORT=${BACKEND_STATEFUL_POSTGRES_PORT_CLUSTER}
+      - POSTGRES_DB=${BACKEND_STATEFUL_POSTGRES_SECRETS_DB}
+      - POSTGRES_USER=${BACKEND_STATEFUL_POSTGRES_SECRETS_USER}
+      - POSTGRES_PASSWORD=${BACKEND_STATEFUL_POSTGRES_SECRETS_PASSWORD}
+      - RABBITMQ_DEFAULT_USER=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_PASS}
+      - RABBITMQ_URL=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_URL}
+    depends_on:
+      - todo-postgres
+      - todo-rabbitmq
+
+  todo-storage-service:
+    container_name: todo-storage-service
+    build:
+      context: ../../../src/todo-storage-service
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-storage-service:dev
+    ports:
+      - 3003:${ROUTING_APIGATEWAY_PORT_TARGET}
+    environment:
+      - POSTGRES_HOST=${BACKEND_STATEFUL_POSTGRES_HOST}
+      - POSTGRES_PORT=${BACKEND_STATEFUL_POSTGRES_PORT_CLUSTER}
+      - POSTGRES_DB=${BACKEND_STATEFUL_POSTGRES_SECRETS_DB}
+      - POSTGRES_USER=${BACKEND_STATEFUL_POSTGRES_SECRETS_USER}
+      - POSTGRES_PASSWORD=${BACKEND_STATEFUL_POSTGRES_SECRETS_PASSWORD}
+    depends_on:
+      - todo-postgres
+
+  todo-api-gateway:
+    container_name: todo-api-gateway
+    build:
+      context: ../../../src/todo-api-gateway
+      dockerfile: ../common/Dockerfile.nodejs.${VARS_BUILD_TYPE}
+    image: todo-api-gateway:dev
+    command: sh /app/start.sh
+    ports:
+      - ${ROUTING_APIGATEWAY_PORT_CLUSTER}:${ROUTING_APIGATEWAY_PORT_TARGET}
+    environment:
+      - RABBITMQ_DEFAULT_USER=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_PASS}
+      - RABBITMQ_URL=${BACKEND_STATELESS_RABBITMQ_SECRETS_DEFAULT_URL}
+      - CACHE_SERVICE_URL=${BACKEND_STATELESS_CACHE_SERVICE_URL}
+      - SEARCH_SERVICE_URL=${BACKEND_STATELESS_SEARCH_SERVICE_URL}
+      - STORAGE_SERVICE_URL=${BACKEND_STATELESS_STORAGE_SERVICE_URL}
+    depends_on:
+      - todo-cache-service
+      - todo-cache-ingestion
+      - todo-search-service
+      - todo-search-ingestion
+      - todo-storage-service
+      - todo-storage-ingestion
+      - todo-rabbitmq
+
+  todo-view:
+    container_name: todo-view
+    build:
+      context: ../../../src/todo-view
+      dockerfile: Dockerfile.${VARS_BUILD_TYPE}
+    image: todo-view:dev
+    ports:
+      - ${FRONTEND_VIEW_PORT_CLUSTER_DEV}:${FRONTEND_VIEW_PORT_TARGET_DEV}
+    volumes:
+      - ../../../src/todo-view:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - todo-api-gateway
+
+  todo-proxy:
+    container_name: todo-proxy
+    build:
+      context: ../../../src/todo-proxy
+      dockerfile: Dockerfile.${VARS_BUILD_TYPE}
+    image: todo-proxy:dev
+    ports:
+      - ${ROUTING_PROXY_PORT_CLUSTER}:${ROUTING_PROXY_PORT_TARGET}
+    depends_on:
+      - todo-api-gateway
+      - todo-view
+
+volumes:
+  postgres-data:
+  elastic-data:

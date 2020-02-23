@@ -1,0 +1,32 @@
+# Use v. 2 as it support resource constraint options
+# (cpu_*, mem_* limits) for non swarm mode in Compose
+# Or use v. 3.7 wit limits
+version: "2.2"
+
+services:
+  todo-rabbitmq:
+    mem_limit: 500m
+  todo-redis:
+    mem_limit: 256m
+  todo-postgres:
+    mem_limit: 1g
+  todo-elastic:
+    mem_limit: 2g
+  todo-cache-ingestion:
+    mem_limit: 128m
+  todo-cache-service:
+    mem_limit: 128m
+  todo-search-ingestion:
+    mem_limit: 128m
+  todo-search-service:
+    mem_limit: 128m
+  todo-storage-ingestion:
+    mem_limit: 128m
+  todo-storage-service:
+    mem_limit: 128m
+  todo-api-gateway:
+    mem_limit: 128m
+  todo-view:
+    mem_limit: 768m
+  todo-proxy:
+    mem_limit: 128m

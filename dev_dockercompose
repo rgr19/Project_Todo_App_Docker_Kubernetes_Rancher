@@ -2,6 +2,6 @@
 
 # shellcheck disable=SC2164
 (CWD=$PWD
-cd task
-CWD=$CWD WDIR='docker_dev' ./docker-compose.sh "$@"
+cd taskset
+CWD=$CWD WDIR='docker/dev' ./docker-compose.sh "$@"
 )
