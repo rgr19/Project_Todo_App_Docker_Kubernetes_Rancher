@@ -155,6 +155,7 @@ class DockerComposeExecutor(ExecutorAbstract, DockerComposeConfigurator):
     DOWN: str = 'down'
     KILL: str = 'kill'
     PULL: str = 'pull'
+    PUSH: str = 'push'
     LOGS: str = 'logs'
 
     KEY_PARALLEL: str = 'parallel'
@@ -190,11 +191,14 @@ class DockerComposeExecutor(ExecutorAbstract, DockerComposeConfigurator):
     def down(self, *argv):
         return self(self.DOWN).with_args(*argv).with_flags(self.KEY_REMOVE_ORPHANS, self.KEY_VOLUMES).spawn()
 
-    def kill(self ):
+    def kill(self):
         return self(self.KILL).spawn()
 
     def pull(self, *argv):
         return self(self.PULL).with_args(*argv).with_flags(self.KEY_PARALLEL).spawn()
+
+    def push(self, *argv):
+        return self(self.PUSH).with_args(*argv).spawn()
 
     def logs(self, *argv):
         return self(self.LOGS).with_args(*argv).with_flags(self.KEY_TIMESTAMPS).spawn()
@@ -231,6 +235,11 @@ class DockerCompose(DockerComposeConfigurator):
     def pull(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.pull')
         return DockerComposeExecutor(**configurationKwargs).pull(*runArgs)
+
+    @staticmethod
+    def push(*runArgs, **configurationKwargs):
+        logger.info(f'{__class__.__name__}.pull')
+        return DockerComposeExecutor(**configurationKwargs).push(*runArgs)
 
     @staticmethod
     def logs(*runArgs, **configurationKwargs):

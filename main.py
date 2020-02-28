@@ -47,11 +47,11 @@ class SetupActions(object):
         task = tasks.add_parser("KILL", aliases=['K', 'kill'], )
         task.set_defaults(main_task=DockerCompose.kill)
 
-        task = tasks.add_parser("PULL", aliases=['P', 'pull'], )
+        task = tasks.add_parser("PULL", aliases=['PL', 'pull'], )
         task.set_defaults(main_task=DockerCompose.pull, DO_RELOAD=True)
 
-        task = tasks.add_parser("PULL", aliases=['P', 'pull'], )
-        task.set_defaults(main_task=DockerCompose.pull, DO_RELOAD=True)
+        task = tasks.add_parser("PUSH", aliases=['PS', 'push'], )
+        task.set_defaults(main_task=DockerCompose.push, DO_RELOAD=True)
 
         task = tasks.add_parser("LOGS", aliases=['L', 'logs'], )
         task.set_defaults(main_task=DockerCompose.logs)
