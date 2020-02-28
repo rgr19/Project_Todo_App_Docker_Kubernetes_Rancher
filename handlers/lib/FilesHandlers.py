@@ -1,10 +1,4 @@
-class File(object):
-
-    @staticmethod
-    def is_yaml(f: str):
-        return f.endswith('yaml') or f.endswith("yml")
-
-
+#!/usr/bin/env python3.7
 import logging
 import os
 from typing import List, Iterable
@@ -15,6 +9,13 @@ import yaml
 logger = logging.getLogger(__name__)
 
 logger.info("Hello logging!")
+
+
+class File(object):
+
+    @staticmethod
+    def is_yaml(f: str):
+        return f.endswith('yaml') or f.endswith("yml")
 
 
 class FileRead(File):
@@ -31,6 +32,7 @@ class FileRead(File):
                 tempText: str = tempFile.read()
                 filesContents.append(tempText)
         return filesContents
+
 
 class FileWrite(File):
 

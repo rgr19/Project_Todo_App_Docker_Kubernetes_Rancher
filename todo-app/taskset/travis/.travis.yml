@@ -2,6 +2,8 @@ dist: xenial
 sudo: required
 language: python
 python: 3.7
+install:
+- pip install -r requirements.txt
 services:
 - docker
 addons:
@@ -13,7 +15,7 @@ before_install:
 - bash ./setup/install/docker_install.sh
 env:
   global:
-    secure: KFkeIR23NLFZV50my1nroakNN6RayM7AzfRBZj+5xbMmoGC+wTqWzE3ngALsC8g5Cf4KuiLrqc6+c6kM6hwG6frbZ+hfVJwpScRWUE7y9/6BjTUcuS5SHmEVmiEOJvy+RV3ErE1J/PD3xR1YnPSyqwyXqwkiGR1rpIrDoUdZ1igjlgtaoY2ccLaiqNG7FHrt4sPBg2bJFX01LmwMCX7OIG8g3l56s0XmbaEq4G2PE0nTi2NYc085N7FSyW9AFuxfL+0OS85x4FlnQzyPK8vfP4RTB0D9B1wTizCXPPxPkaTVFrHFMo65Y6/erDJhm5sFiONhsMOsT5aqKPPWaUhJ5z7ad8OvoKdUAkduNhPkUnRptVjq6+hzz1RbDNGV2Gh1hW6mgJYt7XcuhcvzcK7rVqxhxzrTdCEDjy8vEz1nIbc/y0t3VuvAZU74f70E1ZpbOey6gCrgboXxlyiFaBm55LS5YOmh5zT2vQuopbS0OFaHXEhU/MgXVCD7zzGIT4AkL3aFLAFj/Hl22xP+9idhgszOOApbOC06YXdIVe4FLJhgXXdkw1iGg2QQKZRu+Jfn/7HNXGyQJdwjw+N5Hd2rn78Hg9Av+wYNTCDqpKfS1C1pQLpmP1ZKkT1NmXP/no1TbiEzEvBtaPLFFd4zNK47L+04wEhIXuEPBxvH9izdoWo=
+    secure: S+5JYktFhlTJI4xKeLurmU37PaqxJDsrPEpeJJ7shKY4Gcyw2k3p2bvxpiq2Y7qBTWPyU8nBETnjobfarS6OomIEDBCn4/Z0u/1bWFP6K2G+JIW5sAQE+RZDteui+voxROOjbNT/1WM/75MsC/9NnJTyRr1i3jk744vC/cD4CkowS4oBkOcU19GE0XeRrIQQ9k3lk16xDvlrUm+EcmXXw/g0hkd3ozUoNtbfEmpAiQDaZ/FYiKm/oD0CzH6dsRZP/DIFCNPd5hSEdm7qFW7mZywYSPjVSTJK4rexxGcBbS6Gbbh2S314vdR1l2dp/J6e6C3Q5f/Q7LnBxtC/CaxGd/EmB2Wn/XvYp70e+Uda7z3XOJp73czfbfOzE/Y/6Kc7K6Yech9rFQ0W3JkwnbdIOqMRBWXsooFfjWoSkUK1IBSlIyJG2OecUBJMHww+/ONCopRD/JqBQbsbfFwPYq8gFZ9BjoQ9mn0caWjJTHk+iidIrGM/wzL+kA8nh6N6Lz9yrjb+2rJN86n8itX6PrrzFa0Uu2odkNy+cf1fQp4xFDsu+wG1P49n4MTDMaj2v3lKpkEpMgASb+5328zNhM7qTIdEmn0oqirqZ6WO4eBXxmgZ6j0uBSAeFW/LN4RwWxezjLGguctHfMN6kUvum6yEPJZ0sY5OgTsFIy0NaCc9qWM=
 before_script:
 - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev
   -t $DOCKER_HUB_ID/todo-view-test
