@@ -55,8 +55,8 @@ class TravisConfigurator(TasksetConfig):
         logger.info(f'{__class__.__name__}.save_github_config_to_envfiles')
         if not configurationKwargs:
             logger.exception("Dict of `configurationKwargs` can not be empty.")
-        gitBranch = GitExecutor(**configurationKwargs).branch()
-        gitUserName = GitExecutor(**configurationKwargs).user_name()
+        gitBranch = GitExecutor().branch()
+        gitUserName = GitExecutor().user_name()
         FileWrite(self.GITHUB_BRANCH_ENVFILE, gitBranch)
         FileWrite(self.GITHUB_USER_ENVFILE, gitUserName)
         return self
@@ -133,9 +133,9 @@ class GitExecutor(ExecutorAbstract):
     def __call__(self, subcommand=None) -> Executor:
         return Executor(self.GIT).with_subcommand(subcommand)
 
-    def branch(git):
+    def branch(self):
         logger.info(f'{__class__.__name__}.branch')
-        return git(git.REV_PARSE).with_kwarg(git.ABBREV_REF, git.HEAD).exec().get()
+        return self(self.REV_PARSE).with_kwarg(self.ABBREV_REF, self.HEAD).exec().get()
 
     def user_name(self):
         logger.info(f'{__class__.__name__}.user_name')
