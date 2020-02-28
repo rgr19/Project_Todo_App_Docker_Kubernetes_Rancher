@@ -1,4 +1,4 @@
-version: "VARS_DOCKER_COMPOSE_VERSION"
+version: "DOCKER_COMPOSE_VERSION"
 
 services:
   todo-postgres:

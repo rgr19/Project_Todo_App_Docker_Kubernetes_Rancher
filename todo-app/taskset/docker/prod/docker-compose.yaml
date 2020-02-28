@@ -21,7 +21,7 @@ services:
     container_name: todo-postgres
     build:
       context: ../../../src/todo-postgres
-      dockerfile: ../../../../src/todo-postgres/Dockerfile.prod
+      dockerfile: Dockerfile.prod
     image: todo-postgres:dev
     ports:
       - 5432:5432
@@ -54,7 +54,7 @@ services:
     container_name: todo-cache-ingestion
     build:
       context: ../../../src/todo-cache-ingestion
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-cache-ingestion:dev
     command: sh /app/start.sh
     environment:
@@ -72,7 +72,7 @@ services:
     container_name: todo-cache-service
     build:
       context: ../../../src/todo-cache-service
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-cache-service:dev
     ports:
       - 3001:3000
@@ -86,7 +86,7 @@ services:
     container_name: todo-search-ingestion
     build:
       context: ../../../src/todo-search-ingestion
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-search-ingestion:dev
     command: sh /app/start.sh
     environment:
@@ -103,7 +103,7 @@ services:
     container_name: todo-search-service
     build:
       context: ../../../src/todo-search-service
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-search-service:dev
     command: sh /app/start.sh
     ports:
@@ -118,7 +118,7 @@ services:
     container_name: todo-storage-ingestion
     build:
       context: ../../../src/todo-storage-ingestion
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-storage-ingestion:dev
     command: sh /app/start.sh
     environment:
@@ -138,7 +138,7 @@ services:
     container_name: todo-storage-service
     build:
       context: ../../../src/todo-storage-service
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-storage-service:dev
     ports:
       - 3003:3000
@@ -155,7 +155,7 @@ services:
     container_name: todo-api-gateway
     build:
       context: ../../../src/todo-api-gateway
-      dockerfile: ../../../../src/common/Dockerfile.nodejs.prod
+      dockerfile: ../common/Dockerfile.nodejs.prod
     image: todo-api-gateway:dev
     command: sh /app/start.sh
     ports:
@@ -180,7 +180,7 @@ services:
     container_name: todo-view
     build:
       context: ../../../src/todo-view
-      dockerfile: ../../../../src/todo-view/Dockerfile.prod
+      dockerfile: Dockerfile.prod
     image: todo-view:dev
     ports:
       - 4200:4200
@@ -194,7 +194,7 @@ services:
     container_name: todo-proxy
     build:
       context: ../../../src/todo-proxy
-      dockerfile: ../../../../src/todo-proxy/Dockerfile.prod
+      dockerfile: Dockerfile.prod
     image: todo-proxy:dev
     ports:
       - 8080:80
@@ -205,4 +205,3 @@ services:
 volumes:
   postgres-data:
   elastic-data:
-

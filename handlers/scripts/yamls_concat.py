@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 
 import sys
 from typing import List, Dict, Union
@@ -6,9 +6,6 @@ from typing import List, Dict, Union
 from common import concat_yamls_content, convert_env_to_yaml, write_file
 
 
-def yaml_content_concat(filesList) -> dict:
-    envDict: dict = concat_yamls_content(filesList)
-    return convert_env_to_yaml(envDict)
 
 
 if __name__ == '__main__':

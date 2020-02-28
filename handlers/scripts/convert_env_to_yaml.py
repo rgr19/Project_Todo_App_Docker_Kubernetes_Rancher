@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 import sys
 
 from common import convert_env_to_yaml, write_dict_as_yaml, read_env_file_as_dict

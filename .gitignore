@@ -24,6 +24,6 @@ npm_install_success.txt
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
+!.elasticbeanstalk/*.cfg.yaml
+!.elasticbeanstalk/*.global.yaml
 /.secretfiles/

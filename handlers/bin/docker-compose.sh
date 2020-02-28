@@ -18,13 +18,13 @@ cd "$WDIR"
 function docker_compose_reload_files_from_templates() {
   (
     PROD_CONFIG_YAMLS="
-docker-compose.yml
-docker-compose.override.yml
+docker-compose.yaml
+docker-compose.override.yaml
 "
 
     DEV_CONFIG_YAMLS="
-docker-compose.yml
-docker-compose.limits.yml
+docker-compose.yaml
+docker-compose.limits.yaml
 "
 
     if [[ "$WDIR" == *"dev"* ]]; then

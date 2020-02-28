@@ -6,11 +6,6 @@ function helm_reload_files_from_templates() {
   (
     cd "$CWD/task/helm" || exit 1
 
-    for config in ".todo-app/*.yaml"*; do
-      ../scripts/SortYaml.py \
-        $config \
-        $config
-    done
 
     echo "[INFO] Expand ENVVARS in .todo-app/values/static.yaml"
     ../scripts/file_expand_vars_from_envfile.py \
@@ -40,28 +35,28 @@ function helm_reload_files_from_templates() {
 
     CHART_VERSION=$CHART_VERSION envsubst <".todo-app/Chart.yaml" >".temp/Chart.yaml"
 
-    ../scripts/flatten_yaml.py .temp/values.dynamic.yaml .temp/values.dynamic.yaml
-    ../scripts/flatten_yaml.py .temp/values.dynamic.yaml .temp/values.dynamic.yaml
+    ../scripts/flatten_yaml.py temporary/values.dynamic.yaml temporary/values.dynamic.yaml
+    ../scripts/flatten_yaml.py temporary/secrets.dynamic.yaml temporary/secrets.dynamic.yaml
 
     echo "[INFO] Concat temp YAMLs"
     ../scripts/yamls_concat.py \
-      .temp/values.yaml \
-      .temp/values.*.yaml
+      temporary/values.yaml \
+      temporary/values.*.yaml
 
     ../scripts/yamls_concat.py \
-      .temp/secrets.yaml \
-      .temp/secrets.*.yaml
+      temporary/secrets.yaml \
+      temporary/secrets.*.yaml
 
-    cp .temp/secrets.yaml todo-app/secrets/secrets.yaml
-    cp .temp/values.yaml todo-app/values.yaml
-    cp .temp/Chart.yaml todo-app/Chart.yaml
+    cp temporary/secrets.yaml todo-app/secrets/secrets.yaml
+    cp temporary/values.yaml todo-app/values.yaml
+    cp temporary/Chart.yaml todo-app/Chart.yaml
 
     helm lint todo-app
     if [ $? -ne 0 ]; then
       exit $?
     fi
 
-    helm template todo-app >template.yaml
+    helm template todo-app > template.yaml
     if [ $? -ne 0 ]; then
       exit $?
     fi

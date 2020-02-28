@@ -19,17 +19,17 @@ exit 0
 mkdir -p config
 
 CONFIG_FILES="
-  -f docker-compose.yml
-  -f docker-compose.override.yml
-  -f docker-compose.limits.yml
-  -f kompose.override.yml
+  -f docker-compose.yaml
+  -f docker-compose.override.yaml
+  -f docker-compose.limits.yaml
+  -f kompose.override.yaml
 "
 
 echo "[INFO] Group docker-compose config with subsituted env variables to one file."
-docker-compose $CONFIG_FILES config > docker-compose.resolved.yml
+docker-compose $CONFIG_FILES config > docker-compose.resolved.yaml
 
 kompose convert \
-  -f docker-compose.resolved.yml \
+  -f docker-compose.resolved.yaml \
   --replicas=2 --verbose --out config $@
 
 touch config/todo-config.dynamic.yaml

@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+    kompose.cmd: kompose convert -f docker-compose.resolved.yaml --replicas=2 --verbose
       --out config --verbose
     kompose.version: 1.19.0 (f63a961c)
     namespace: todo
@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.resolved.yml --replicas=2 --verbose
+        kompose.cmd: kompose convert -f docker-compose.resolved.yaml --replicas=2 --verbose
           --out config --verbose
         kompose.version: 1.19.0 (f63a961c)
         namespace: todo

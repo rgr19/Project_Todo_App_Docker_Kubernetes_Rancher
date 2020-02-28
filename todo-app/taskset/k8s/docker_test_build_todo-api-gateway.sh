@@ -1,1 +1,0 @@
-../docker_prod/docker_test_build_todo-api-gateway.sh

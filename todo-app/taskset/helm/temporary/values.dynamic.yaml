@@ -1,0 +1,8 @@
+VARS:
+  BUILD_TYPE: prod
+  DOCKER_HUB_ID: onceawaken
+  GITHUB_BRANCH: 010_todo_app_with_helm_for_kubernetes
+  GITHUB_USER: rgr19
+  NAMESPACE: todo
+  RUNTIME_TYPE: 
+

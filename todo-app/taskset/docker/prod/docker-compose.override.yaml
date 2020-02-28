@@ -31,4 +31,3 @@ services:
       - 4201:8080 # to match todo-view/custom.nginx
   todo-proxy:
     image: onceawaken/todo-proxy:1.0
-

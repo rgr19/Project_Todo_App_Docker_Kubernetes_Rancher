@@ -33,8 +33,8 @@ touch .envfiles/{GITHUB_BRANCH,GITHUB_USER}
 get_github_branch_current >.envfiles/GITHUB_BRANCH
 get_git_user_name >.envfiles/GITHUB_USER
 
-TEMPLATE_TRAVIS_BASE_YML=taskset/travis/template/.travis.base.yml
-TEMPLATE_TRAVIS_AWS_YML=taskset/aws/template/.travis.aws.yml
+TEMPLATE_TRAVIS_BASE_YML=taskset/travis/template/.travis.base.yaml
+TEMPLATE_TRAVIS_AWS_YML=taskset/aws/template/.travis.aws.yaml
 TRAVIS_YML=.travis.yml
 
 echo "[INFO] Get $TRAVIS_YML from templates for TASK:"

@@ -1,24 +1,27 @@
 dist: trusty
 sudo: required
+python:
+  - 3.7
 services:
-- docker
+  - docker
 addons:
   apt:
     packages:
-    - docker-ce
+      - docker-ce
 before_install:
-- "./taskset/setup/install/docker_install.sh"
+  - bash ./setup/fix/no_public_key_fix.sh
+  - bash ./setup/install/docker_install.sh
 env:
   global:
-    secure: FURGzN8o5XQojHesYUIGlByTpjDXXZGLdHuOL1agap/dAkvfbMbNv1RYhLTGpUynAQEJ7fJ8VcMhPHA6Txl49Vau9E5hZiJYuqF7SLg26vCLhYRh5lZMeOsphZBtP9aTIcardb01PD8qAzn1Q3KyyTRDGKSjhxwy115LJGnbSWy6Te+c+99wSjVComS5uMAsKqZ6vmAqnPRCVL74+FnHpsSRGc1XLVSkS7tkViMk+w8vfpNFzO4XNRnns1Yw1lapuQVVchemXbz6VvRRBrLz2UUb+Lme8I9YirTGBuR/iK8jC6rXaHpBKQxrmxACDCaWaZwyn1sMbrgSM6SPdWuUzujTiybCKiVlDKDkcKvaUuOjyO5ytWk8CLnQf3za5ssRHjWCFZG8wS5ICw8zTJkmlFJr7YZXmHDaIirQewDs+kE/0VpmuJs6x5sSDZ4MrlFkklqrg6UNKBBEn50d8nlDHXgxdFBjLYjB0Am39vksyPt0uRYTE7C7EwSi3SQBW/mmuXpuqEL/QAIeBv+DBCyfyWsyid60fenLwbo9sqRYGYq/rqLzHCvmPzahYUMSTYE4T75nvrluHJE6gNaGG69GXpN3GILHtyhtP8jfe5F4Wtm9RTmtFTu2HFlnHumK4ypJSChlkuPYB1uVqpWLHvv6rWyPrbMJuMUJEUmykW5ARXQ=
+    secure: VroWGvTuCTncu+llEAQ5HKzUvq3NgFO6jcCdGSUXHP3mFmjIt+T8G0DZnIe/E6n+imuwPlvCq5r7Y6Q5nIWVZtovdBTC5U5IhOq0hr0ZffyiHblCAF2pSVrdGGOzFKB1+RxVK1YBr1jrVDmlOJ9ueusSPtppbmHdy/m9R2qD6GLEAcEujatLvh7V0+IBp8DVGXEB9CiRpscks5NeX3X2SyVmBVbP7mOmwaf1QAslMTlqRprODWltHTUZgLmxNONSpRp17tnUTSGHWXxb9X6l03YDbwqkHY8/s3NrgYIVjTYv8qSb/VROmcoG2FXGgDf9vcLtjp2Vvox7h10cqNGoIGRuy4C1q0zm1Kl3q7VEcBwM4OJfDeyiT0hyZFSGDwf+GUV/WD3humjt8S77yFzUg4X7FmZ8KJMWSPAXOb9uRGGu3pFaUcvLl5PIsbK8t2IYpHX0Az7DriYD7qN7NHJwkKfjKyvWzKhOG+FG3HcaBY4zZA+XL00hREi/9b+LvI4xSI4FL9qLG8EAi7IQZrdl97Ftu6v4kDySqw2foFFNJo8bDO5fAOZDB35qwGEDyR19gpQ4q6/QlEiUMuDzkoR1f5AMmKqeHQNp0SSmk3L3Knf7hRYVRZkNlyfvCS6y+4aftwTi6kH3/i68qKXsR0NIqN5Q3xtvowlSvIX0cWrWuJc=
 before_script:
-- docker build ./src/todo-view -f ./src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
-- docker build ./src/todo-cache-service -f ./src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
+  - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
+  - docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
-- docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
-  --watch=false --no-progress
-- docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
+  - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox --watch=false --no-progress
+  - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
-- "./prod_dockercompose build"
-- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-- "./prod_dockercompose push"
+  - python3.7 main.py DC BUILD
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+  - python3.7 main.py DC PUSH
+

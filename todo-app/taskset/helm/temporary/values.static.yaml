@@ -1,0 +1,170 @@
+BACKEND:
+  STATEFUL:
+    ELASTICSEARCH:
+      HOST: todo-elastic
+      IMAGE:
+        PULLPOLICY: Always
+        TAG: 6.6.1
+      MEMORY: 2Gi
+      PORT:
+        CLUSTER:
+          HTTP: 9200
+          TRANSPORT: 9300
+        NAME:
+          HTTP: es-http
+          TRANSPORT: es-transport
+        TARGET:
+          HTTP: 9200
+          TRANSPORT: 9300
+      PV:
+        HOSTPATH: /tmp/data/kubedata/todo/elastic
+        STORAGE: 500Mi
+      REPLICAS: 1
+    POSTGRES:
+      HOST: todo-postgres
+      IMAGE:
+        PULLPOLICY: Always
+        TAG: '1.0'
+      MEMORY: 1Gi
+      PORT:
+        CLUSTER: 5432
+        NAME: database-tcp-port
+        TARGET: 5432
+      PV:
+        HOSTPATH: /tmp/data/kubedata/todo/postgres
+        STORAGE: 500Mi
+      REPLICAS: 1
+      SECRETS:
+        DB: todo
+        PASSWORD: todo1234
+        USER: todo
+    REDIS:
+      HOST: todo-redis
+      IMAGE:
+        PULLPOLICY: Always
+        TAG: 5.0.3
+      MEMORY: 256Mi
+      PORT:
+        CLUSTER: 6379
+        NAME: cache-port
+        TARGET: 6379
+      REPLICAS: 1
+  STATELESS:
+    CACHE:
+      INGESTION:
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: 1.0
+        MEMORY: 128Mi
+        REPLICAS: 1
+      SERVICE:
+        HOST: todo-cache-service
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: '1.0'
+        MEMORY: 128Mi
+        PORT:
+          CLUSTER: 3000
+          NAME: http
+          TARGET: 3000
+        REPLICAS: 2
+        URL: http://todo-cache-service:3000
+    RABBITMQ:
+      HOST: todo-rabbitmq
+      IMAGE:
+        PULLPOLICY: Always
+        TAG: 3.7.13-management
+      MEMORY: 500Mi
+      PORT:
+        CLUSTER:
+          AMQP: 5672
+          HTTP: 8081
+        NAME:
+          AMQP: amqp
+          HTTP: http
+        TARGET:
+          AMQP: 5672
+          HTTP: 15672
+      REPLICAS: 1
+      SECRETS:
+        DEFAULT:
+          PASS: todo1234
+          URL: amqp://todo:todo1234@todo-rabbitmq
+          USER: todo
+    SEARCH:
+      INGESTION:
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: '1.0'
+        MEMORY: 128Mi
+        REPLICAS: 1
+      SERVICE:
+        HOST: todo-search-service
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: '1.0'
+        MEMORY: 128Mi
+        PORT:
+          CLUSTER: 3000
+          NAME: http
+          TARGET: 3000
+        REPLICAS: 2
+        URL: http://todo-search-service:3000
+    STORAGE:
+      INGESTION:
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: '1.0'
+        MEMORY: 128Mi
+        REPLICAS: 1
+      SERVICE:
+        HOST: todo-storage-service
+        IMAGE:
+          PULLPOLICY: Always
+          TAG: '1.0'
+        MEMORY: 128Mi
+        PORT:
+          CLUSTER: 3000
+          NAME: http
+          TARGET: 3000
+        REPLICAS: 2
+        URL: http://todo-storage-service:3000
+FRONTEND:
+  VIEW:
+    IMAGE:
+      PULLPOLICY: Always
+      TAG: '1.0'
+    MEMORY: 768Mi
+    PORT:
+      CLUSTER:
+        DEV: 4200
+        HTTP: 8080
+      NAME:
+        DEV: dev
+        HTTP: http
+      TARGET:
+        DEV: 4200
+        HTTP: 8080
+    REPLICAS: 1
+ROUTING:
+  APIGATEWAY:
+    IMAGE:
+      PULLPOLICY: Always
+      TAG: '1.0'
+    MEMORY: 128Mi
+    PORT:
+      CLUSTER: 3000
+      NAME: http
+      TARGET: 3000
+    REPLICAS: 2
+  PROXY:
+    IMAGE:
+      PULLPOLICY: Always
+      TAG: '1.0'
+    MEMORY: 128Mi
+    PORT:
+      CLUSTER: 8080
+      NAME: https
+      TARGET: 80
+    REPLICAS: 2
+

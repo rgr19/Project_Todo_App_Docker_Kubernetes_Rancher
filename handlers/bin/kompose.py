@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 
 from handlers.lib.TaskHandler import TaskHandler
 

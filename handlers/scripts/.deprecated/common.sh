@@ -115,13 +115,13 @@ function symlink_k8s_files() {
 }
 
 function symlink_prod_files() {
-  files=".env.dc docker-compose.override.yml docker-compose.limits.yml"
+  files=".env.dc docker-compose.override.yaml docker-compose.limits.yaml"
   symlink_files_from_src $PROD_DIR $files
   symlink_from_src_by_bothfix "$PROD_DIR" 'docker' '.sh'
 }
 
 function symlink_dev_files() {
-  files="docker-compose.yml"
+  files="docker-compose.yaml"
   symlink_files_from_src "$DEV_DIR" $files
   symlink_from_src_by_bothfix "$DEV_DIR" 'docker' '.sh'
 

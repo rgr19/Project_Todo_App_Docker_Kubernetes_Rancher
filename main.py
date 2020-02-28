@@ -1,79 +1,114 @@
-#!/usr/bin/env python3
-import logging
-import os
-import sys
-import coloredlogs, logging
-import traceback
-
+#!/usr/bin/env python3.7
 import argparse
-from pprint import pprint
+import logging
+import sys
+from types import GeneratorType
 
-import inspect
+import coloredlogs
 
-import multiline_formatter.formatter
-
-from handlers.lib.RainbowStreamHandler import RainbowStreamHandler
+from handlers.bin.aws import Aws
+from handlers.bin.docker_compose import DockerCompose
 from handlers.bin.helm import Helm
-from handlers.bin.docker import Docker
+from handlers.bin.travis import Travis
+from handlers.lib.Executor import ExecutorOutputParser
 
 
 class SetupActions(object):
 
-    def __init__(self, mainParser):
+    def __init__(self, parser):
         # construct the argument parser and parse the arguments
-        self.mainParser = mainParser
+        self.mainParser = parser
 
-        self.operationParsers = self.mainParser.add_subparsers(dest='OPERATION', required=False, description="Todo App operations selector.")
-        self.setup_docker_parser()
+        self.operationParsers = self.mainParser.add_subparsers(dest='OPERATION', required=True, description="Todo App operations selector.")
+        self.setup_helm_parser()
+        self.setup_docker_compose_parser()
         self.setup_travis_parser()
         self.setup_aws_parser()
         self.setup_kompose_parser()
         self.setup_k8s_parser()
-        self.setup_helm_parser()
+
+    def setup_docker_compose_parser(self):
+        epilog = 'Note: Helm values.yaml will be converted to .env.helm and used.'
+        dockerCompose = self.operationParsers.add_parser("DOCKER_COMPOSE", aliases=['DC'], epilog=epilog)
+        dockerCompose.set_defaults(config_task=DockerCompose.main)
+        dockerCompose.set_defaults(DO_RELOAD=False)
+
+        tasks = dockerCompose.add_subparsers(dest='TASK', required=True, )
+
+        task = tasks.add_parser("BUILD", aliases=['B', 'build'], )
+        task.set_defaults(main_task=DockerCompose.build, DO_RELOAD=True)
+
+        task = tasks.add_parser("UP", aliases=['U', 'up'], )
+        task.set_defaults(main_task=DockerCompose.up, DO_RELOAD=True)
+
+        task = tasks.add_parser("DOWN", aliases=['D', 'down'], )
+        task.set_defaults(main_task=DockerCompose.down)
+
+        task = tasks.add_parser("KILL", aliases=['K', 'kill'], )
+        task.set_defaults(main_task=DockerCompose.kill)
+
+        task = tasks.add_parser("PULL", aliases=['P', 'pull'], )
+        task.set_defaults(main_task=DockerCompose.pull, DO_RELOAD=True)
+
+        task = tasks.add_parser("PULL", aliases=['P', 'pull'], )
+        task.set_defaults(main_task=DockerCompose.pull, DO_RELOAD=True)
+
+        task = tasks.add_parser("LOGS", aliases=['L', 'logs'], )
+        task.set_defaults(main_task=DockerCompose.logs)
+
+        task = tasks.add_parser("INSTALL", aliases=['I', 'install'], )
+        task.set_defaults(main_task=DockerCompose.install, DO_RELOAD=True)
 
     def setup_helm_parser(self, ):
         helm = self.operationParsers.add_parser("HELM", aliases=['H'], )
-        helm.add_argument("-v", "--version", required=False, help="Override version.", default="0.0.0")
+        helm.add_argument("-s", "--sort-config-yamls", dest='DO_SORT_CONFIG_YAMLS', type=bool, required=False, default=True)
+        helm.set_defaults(config_task=Helm.main, DO_RELOAD=True)
 
-        helm.add_argument("--main", dest='main', default=Helm.main)
+        tasks = helm.add_subparsers(dest='TASK', required=True, )
 
-        task = helm.add_subparsers(dest='TASK', required=True, )
+        task = tasks.add_parser("LINT", aliases=['L', 'lint'], )
+        task.set_defaults(main_task=Helm.lint)
+        task = tasks.add_parser("TEMPLATE", aliases=['T', 'template'])
+        task.set_defaults(main_task=Helm.template)
+        task = tasks.add_parser("DRY-RUN", aliases=['D', 'dry-run'])
+        task.set_defaults(main_task=Helm.dry_run)
+        task = tasks.add_parser("FULL_CHECK", aliases=['F', 'full-check'])
+        task.set_defaults(main_task=Helm.full_check)
+        task = tasks.add_parser("INSTALL", aliases=['I', 'install'])
+        task.set_defaults(main_task=Helm.install)
 
-        taskLint = task.add_parser("LINT", aliases=['L'], )
-        taskLint.add_argument("--lint", dest='task', default=Helm.lint)
+    def setup_aws_parser(self):
+        aws = self.operationParsers.add_parser("AWS", aliases=['A'], )
+        aws.add_argument("-a", "--aws-app-env", dest='AWS_APP_ENV', type=str, required=False)
+        aws.set_defaults(config_task=Aws.main, )
 
-        taskTemplate = task.add_parser("TEMPLATE", aliases=['T'])
-        taskTemplate.add_argument("--template", dest='task', default=Helm.template)
+        tasks = aws.add_subparsers(dest='TASK', required=True, )
 
-        taskDryRun = task.add_parser("DRY-RUN", aliases=['D'])
-        taskDryRun.add_argument("--dry-run", dest='task', default=Helm.dry_run)
+        task = tasks.add_parser("RUN", aliases=['R', 'run'], )
+        task.set_defaults(main_task=Aws.run)
 
-        taskDryRun = task.add_parser("FULL_CHECK", aliases=['F'])
-        taskDryRun.add_argument("--full-check", dest='task', default=Helm.full_check)
+        task = tasks.add_parser("SETENV", aliases=['S', 'setenv'], )
+        task.set_defaults(main_task=Aws.setenv)
 
-        taskInstall = task.add_parser("INSTALL", aliases=['I'])
-        taskInstall.add_argument("--install", dest='task', default=Helm.install)
+        task = tasks.add_parser("USE", aliases=['U', 'use'], )
+        task.set_defaults(main_task=Aws.use)
 
-    def setup_docker_parser(self):
-        docker = self.operationParsers.add_parser("DOCKER", aliases=['D'], )
-
-        runtype = docker.add_subparsers(dest='RUNTYPE', required=True, )
-        runtypeProd = runtype.add_parser("PROD", aliases=['P'], )
-        runtypeProd.add_argument("prod", action=Docker.Prod)
-        runtypeDev = runtype.add_parser("DEV", aliases=['D'], )
-        runtypeDev.add_argument("dev", action=Docker.Dev)
+        task = tasks.add_parser("LIST", aliases=['L', 'list'], )
+        task.set_defaults(main_task=Aws.list)
 
     def setup_travis_parser(self):
         travis = self.operationParsers.add_parser("TRAVIS", aliases=['T'], )
+        travis.add_argument("-m", "--git-message", dest='GIT_MESSAGE', type=str, required=False)
+        travis.set_defaults(config_task=Travis.main, )
 
-        runtype = travis.add_subparsers(dest='RUNTYPE', required=True, )
-        runtypeBasic = runtype.add_parser("NONE", aliases=['N'], )
-        runtypeAws = runtype.add_parser("AWS", aliases=['A'], )
-        runtypeK8s = runtype.add_parser("K8S", aliases=['K'], )
-        runtypeHelm = runtype.add_parser("HELM", aliases=['H'], )
 
-    def setup_aws_parser(self):
-        argsAws = self.operationParsers.add_parser("AWS", aliases=['A'], )
+        tasks = travis.add_subparsers(dest='TASK', required=True, )
+
+        task = tasks.add_parser("BASIC", aliases=['B'], )
+        task.set_defaults(main_task=Travis.basic)
+
+        task = tasks.add_parser("AWS", aliases=['A'], )
+        task.set_defaults(main_task=Travis.aws)
 
     def setup_kompose_parser(self):
         argsKompose = self.operationParsers.add_parser("KOMPOSE", aliases=['k'], )
@@ -85,48 +120,54 @@ class SetupActions(object):
         return self.mainParser.parse_args(argv, )
 
 
-def main(mainParser, argv):
+def main(parser, argv):
     logger.info(f' main : {argv}')
-    SetupActions(mainParser)
-    parsedArgs = mainParser.parse_args(argv, )
-    argsDict = vars(parsedArgs)
+    SetupActions(parser)
+    parsedArgs, customArgs = parser.parse_known_args(argv)
+    print(parsedArgs)
+    print(customArgs)
+    kwargsDict = vars(parsedArgs)
 
-    main = argsDict.pop('main')
-    task = argsDict.pop('task')
+    config_task = kwargsDict.pop('config_task')
+    main_task = kwargsDict.pop('main_task')
 
-    main(**argsDict)
-    task(**argsDict)
+    if config_task:
+        config_task(**kwargsDict)
 
-    return argsDict, parsedArgs
+    if main_task:
+        if isinstance(main_task, list):
+            if len(main_task) == 2:
+                main_task, taskArgs = main_task
+            else:
+                main_task, taskArgs = main_task[0], tuple()
+            out = main_task(*taskArgs, *customArgs, **kwargsDict)
+        else:
+            out = main_task(*customArgs, **kwargsDict)
 
+        if isinstance(out, ExecutorOutputParser):
+            out.print()
+        elif isinstance(out, GeneratorType):
+            for genOut in out:
+                if isinstance(genOut, ExecutorOutputParser):
+                    genOut.print()
 
-#
-# def exception_handler(type, value, tb):
-#     logger.error(f"Uncaught exception: {value}, TYPE:{type} TB:")
-#     print(traceback.extract_tb(tb))
-#
-# # Install exception handler
-# sys.excepthook = exception_handler
 
 if __name__ == '__main__':
-
     logger = logging.getLogger(__name__)
-    # By default the install() function installs a handler on the root logger,
-    # this means that log messages from your code and log messages from the
-    # libraries that you use will all show up on the terminal.
 
-    # exceptionFormatter = multiline_formatter.formatter.MultilineMessagesFormatter('[%(levelname)s] %(message)s')
-    # errorHandler = logging.StreamHandler(sys.stderr)
-    # errorHandler.setFormatter(exceptionFormatter)
-    # errorHandler.setLevel(logging.ERROR)
-    #
-    # logger.addHandler(errorHandler)
     infoFormat = "%(asctime)s,%(msecs)03d [%(hostname)s] [%(process)d] [%(programname)s.%(name)s:%(lineno)d] %(levelname)s => %(message)s"
     coloredlogs.install(level='INFO', fmt=infoFormat, )
-    # Create a logger object.
 
-    mainParser = argparse.ArgumentParser(prog="MAIN", description="Project Main CLI.", conflict_handler='resolve')
-    mainParser.add_argument('-b', '--build-type', dest='BUILD_TYPE', type=str, default='prod', required=False)
-    mainParser.add_argument('-p', '--project-name', dest='PROJECT_NAME', type=str, default='todo-app', required=False)
+    mainParser = argparse.ArgumentParser(prog="MAIN", description="Project Main CLI.")
+    mainParser.add_argument('-b', '--build-type', dest='BUILD_TYPE', default='prod', required=False, choices='DEV PROD'.split())
+    mainParser.add_argument('-p', '--project-name', dest='PROJECT_NAME', default='todo-app', required=False)
+    mainParser.add_argument('-e', '--envfiles-dir', dest='DIR_ENVFILES', default='.envfiles', required=False)
+    mainParser.add_argument('-s', '--secretfiles-dir', dest='DIR_SECRETFILES', default='.secretfiles', required=False)
+    mainParser.add_argument("-v", "--project-version", dest='PROJECT_VERSION', default="0.0.0", required=False, help="Set project version.")
 
-    argsDict, parsedArgs = main(mainParser, sys.argv[1:])
+    mainParser.set_defaults(config_task=None)
+    mainParser.set_defaults(custom_task=None)
+    mainParser.set_defaults(main_task=None)
+    mainParser.set_defaults(DO_RELOAD=False)
+
+    main(mainParser, sys.argv[1:])

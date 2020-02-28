@@ -1,0 +1,49 @@
+
+install.go:149: [debug] Original chart version: ""
+install.go:166: [debug] CHART PATH: /home/rgr/W/W.priv/Web/Blogs/HugoBlog/onceawaken.com/content/courses/devops/udemy/deploy_and_run_apps_with_docker_kubernetes_helm_rancher/codes/todo-app/todo-app/taskset/helm/todo-app
+
+Error: unable to build kubernetes objects from release manifest: error validating "": error validating data: unknown object type "nil" in Secret.stringData.RABBITMQ_DEFAULT_PASS
+helm.go:76: [debug] error validating "": error validating data: unknown object type "nil" in Secret.stringData.RABBITMQ_DEFAULT_PASS
+helm.sh/helm/v3/pkg/kube.scrubValidationError
+	/home/circleci/helm.sh/helm/pkg/kube/client.go:525
+helm.sh/helm/v3/pkg/kube.(*Client).Build
+	/home/circleci/helm.sh/helm/pkg/kube/client.go:137
+helm.sh/helm/v3/pkg/action.(*Install).Run
+	/home/circleci/helm.sh/helm/pkg/action/install.go:229
+main.runInstall
+	/home/circleci/helm.sh/helm/cmd/helm/install.go:214
+main.newInstallCmd.func1
+	/home/circleci/helm.sh/helm/cmd/helm/install.go:116
+github.com/spf13/cobra.(*Command).execute
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:826
+github.com/spf13/cobra.(*Command).ExecuteC
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:914
+github.com/spf13/cobra.(*Command).Execute
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:864
+main.main
+	/home/circleci/helm.sh/helm/cmd/helm/helm.go:75
+runtime.main
+	/usr/local/go/src/runtime/proc.go:203
+runtime.goexit
+	/usr/local/go/src/runtime/asm_amd64.s:1357
+unable to build kubernetes objects from release manifest
+helm.sh/helm/v3/pkg/action.(*Install).Run
+	/home/circleci/helm.sh/helm/pkg/action/install.go:231
+main.runInstall
+	/home/circleci/helm.sh/helm/cmd/helm/install.go:214
+main.newInstallCmd.func1
+	/home/circleci/helm.sh/helm/cmd/helm/install.go:116
+github.com/spf13/cobra.(*Command).execute
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:826
+github.com/spf13/cobra.(*Command).ExecuteC
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:914
+github.com/spf13/cobra.(*Command).Execute
+	/go/pkg/mod/github.com/spf13/cobra@v0.0.5/command.go:864
+main.main
+	/home/circleci/helm.sh/helm/cmd/helm/helm.go:75
+runtime.main
+	/usr/local/go/src/runtime/proc.go:203
+runtime.goexit
+	/usr/local/go/src/runtime/asm_amd64.s:1357
+
+1
