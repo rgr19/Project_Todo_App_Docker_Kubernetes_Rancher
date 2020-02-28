@@ -1,7 +1,7 @@
 dist: trusty
 sudo: required
-python:
-- 3.7
+language: python
+python: 3.7
 services:
 - docker
 addons:
@@ -13,7 +13,7 @@ before_install:
 - bash ./setup/install/docker_install.sh
 env:
   global:
-    secure: YhwPauyRZjHCWYWaH/NuE3rMo9m2/sXJrjc9z8D0S4+3GtUoyavFLVNAQaWx8/533/LBJ+Tec3CrvcWTxN/5RzhZ9CQD16g42uHEPrdNrMeAiTEthVC9kDbO4lGjzvlZVOeYWZac5X1+Q8OdQFy6x9c3rp5uBUsZKw8k/4mtJ22InOvTUc+7wqW/zOT/AjjhirG8GaqAxsIcV4Xt3rBngFAi04tvSodSpVeKkZZskjOAuVfoIPDtEtyKgd4579bK+EkScOMna5oT8SXOYUZZQaemnqSYdy9AQRNhC5b6Wc6jaAFiIS4PJtKEyz4jLNGY5x0LjGG81Pdz7uOMNEgrHnO0m0/6rf2S/0zpMPzzlqSdhz7FtOLrLBgv15KVrt2NLCYQNosUrh+M/hSp21mSclWOz1OmTvQV6SkCNWqX+aMlmV/K1DBmLjBOeYCEzkaLEO39l+WSGkn/AB5QNX8lsQcPVCh+i3MdH3d2wNs63k6UDyQA5B/uRquFwA5ID5GtUeW7qkEDdxMVzvG8MkppJZ3lP/xHMVebm3AHmEKAe3Vbe0ZYlWqb3CkUKbEuyLyvAyLgpJWAyLTWhtreenftIw07aE4OfKbfURu/IQBYts3aiAyoMC7zyMRdJjtH93+NZSm8sqLANCYjKU8HANDYD/iRHZANgyg1yNJWWWycpOs=
+    secure: fML2sGO5iuTwV7CKanUynDT9pJJhB1lhgMuN5a5wVj0tQF/C+OnhJkGh4ju8GhIxUevszc+oUKk1/Nc6Fd1KEknPewhLKAFVsLvqfVo9yPi5Brq8WIriP0gtnvBsxW8rhLDWrhoPlD0ia88ff1TqQerQEocCk7/OUuaLQE/UzL8UBeYzL0ECT1EJ24tCc4W3hIdZjUKt47hh4L2AuUr8mpw2oUpQ/LZE5F68Sy/OOIS7RtQeuHJAPM2z5leD5hQltYagcEF4icc0LUfbgOQiUIjD9mB8KCXwQT3JO7pntjdVXmFKhniHNcqtogbhvL6B/toKf1sKy4T3wAaUMSX0WSoe1B4Z2ZEVRFXbri8phiWjdzds9q9ENgjM9Ks66/kg7sUOIjLr1aYP55dozi5XvLGBnHnR6z+wsTUCOrYeGfvaw2jEQdNErZ5b3pHwnIisCtOsQm8fp+DAiTKxE1ue0SjqbMdEV3vYqlPW4KetTb2t4AIAY6uAuVTS5M6BM9GdwAMkcsgRw+gs57B9lD4LPLuPJ8EMY3nyV0UHdy/knQ8cMJfi3pls0maSNMbIUf5ZLD8zFGJatzXjvaAMq2R/0A8U1aKwVQoNyx/hnkj+ioRKFkL/M9c5Z5mdhrfJgA/nYRCw+z+9AK7Br/dH/JhQMyqLYOw4FPQIoN1WMT2gT7w=
 before_script:
 - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev
   -t $DOCKER_HUB_ID/todo-view-test

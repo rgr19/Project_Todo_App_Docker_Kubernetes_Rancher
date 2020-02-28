@@ -101,7 +101,6 @@ class SetupActions(object):
         travis.add_argument("-m", "--git-message", dest='GIT_MESSAGE', type=str, required=False)
         travis.set_defaults(config_task=Travis.main, )
 
-
         tasks = travis.add_subparsers(dest='TASK', required=True, )
 
         task = tasks.add_parser("BASIC", aliases=['B'], )

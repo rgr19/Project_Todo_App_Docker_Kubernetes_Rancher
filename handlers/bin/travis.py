@@ -116,7 +116,7 @@ class TravisConfigurator(TasksetConfig):
         return travis
 
 
-class GitExecutor(ExecutorAbstract, TravisConfigurator):
+class GitExecutor(ExecutorAbstract):
     GIT: str = 'git'
     REV_PARSE: str = 'rev-parse'
     ABBREV_REF: str = 'abbrev-ref'
@@ -133,9 +133,9 @@ class GitExecutor(ExecutorAbstract, TravisConfigurator):
     def __call__(self, subcommand=None) -> Executor:
         return Executor(self.GIT).with_subcommand(subcommand)
 
-    def branch(self):
+    def branch(git):
         logger.info(f'{__class__.__name__}.branch')
-        return self(self.REV_PARSE).with_kwarg(self.ABBREV_REF, self.HEAD).exec().get()
+        return git(git.REV_PARSE).with_kwarg(git.ABBREV_REF, git.HEAD).exec().get()
 
     def user_name(self):
         logger.info(f'{__class__.__name__}.user_name')
@@ -154,15 +154,15 @@ class GitExecutor(ExecutorAbstract, TravisConfigurator):
         logger.info(f'{__class__.__name__}.push_origin => BRANCH: {branch}')
         return self(self.PUSH).with_args(self.ORIGIN, branch).spawn()
 
-    def task(self, taskMode, gitMsg: str = None, ):
-        logger.info(f'{__class__.__name__}.main')
+    def task(self, taskMode, GIT_MESSAGE: str = None, ):
+        logger.info(f'{__class__.__name__}.task => {taskMode}, GIT_MESSAGE => {GIT_MESSAGE}')
         if taskMode is None:
             logger.exception("Task mode can not be None.")
-        if not gitMsg:
-            gitMsg = f"Travis AUTO commit in MODE {taskMode}"
+        if not GIT_MESSAGE:
+            GIT_MESSAGE = f"Travis AUTO commit in MODE {taskMode}"
 
         self.add_all()
-        self.commit_msg(gitMsg)
+        self.commit_msg(GIT_MESSAGE)
         self.push_origin()
 
 
@@ -178,36 +178,37 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
         return Executor(self.TRAVIS).with_cwd(self.cwdPath).with_subcommand(subcommand)
 
     def encrypt(self, *secrets):
-        logger.info(f'{__class__.__name__}.')
+        logger.info(f'{__class__.__name__}.encrypt')
         self(self.ENCRYPT).with_args(*secrets).with_kwarg(self.ADD, self.ENV_GLOBAL).with_flags(self.OVERRIDE, self.ORG).spawn()
 
-    def basic(self):
-        logger.info(f'{__class__.__name__}.')
+    def basic(self, GIT_MESSAGE: str, *secrets: str):
+        logger.info(f'{__class__.__name__}.basic')
+        self.task(GIT_MESSAGE, self.TASK_MODE_BASIC, *secrets)
 
-    def aws(self):
-        logger.info(f'{__class__.__name__}.')
+    def aws(self, GIT_MESSAGE: str, *secrets: str):
+        logger.info(f'{__class__.__name__}.aws')
+        self.task(GIT_MESSAGE, self.TASK_MODE_AWS, *secrets)
 
-    def task(self, taskMode, *secrets: str):
+    def task(self, GIT_MESSAGE: str, taskMode, *secrets: str):
         logger.info(f'{__class__.__name__}.main')
 
         self.merge_travis_templates_to_root(taskMode)
         self.load_envvars_and_secrets(taskMode, *secrets)
         self.encrypt(*self.envVarsSecrets)
+        GitExecutor().task(taskMode, GIT_MESSAGE)
 
 
 class Travis(TravisConfigurator):
 
     @staticmethod
-    def basic(gitMsg: str = None, *secrets: str, **configurationKwargs):
+    def basic(GIT_MESSAGE: str = None, *secrets: str, **configurationKwargs):
         logger.info(f'{__class__.__name__}.basic')
-        TravisExecutor(**configurationKwargs).task(Travis.TASK_MODE_BASIC, *secrets)
-        GitExecutor(**configurationKwargs).task(Travis.TASK_MODE_BASIC, gitMsg)
+        TravisExecutor(**configurationKwargs).basic(GIT_MESSAGE, *secrets)
 
     @staticmethod
-    def aws(gitMsg: str = None, *secrets: str, **configurationKwargs):
+    def aws(GIT_MESSAGE: str = None, *secrets: str, **configurationKwargs):
         logger.info(f'{__class__.__name__}.aws')
-        TravisExecutor(**configurationKwargs).task(Travis.TASK_MODE_AWS, *secrets)
-        GitExecutor(**configurationKwargs).task(Travis.TASK_MODE_AWS, gitMsg)
+        TravisExecutor(**configurationKwargs).aws(GIT_MESSAGE, *secrets)
 
     @staticmethod
     def encrypt(*secrets: str, **configurationKwargs):
