@@ -41,7 +41,7 @@ class DockerComposeConfigurator(TasksetConfig):
     ]
 
     def __init__(self, **configurationVariables):
-        logger.info(f'{__class__.__name__}.__init__')
+        logger.debug(f'{__class__.__name__}.__init__')
         super().__init__(RUNTIME_TYPE=self.DOCKER_COMPOSE, **configurationVariables)
 
         self.taskPath = os.path.join(self.PATH_TASKSET, self.DOCKER)
@@ -73,11 +73,11 @@ class DockerComposeConfigurator(TasksetConfig):
         os.makedirs(self.tempPath, exist_ok=True)
 
     def copy_helm_values_as_env_helm(self, yamlPath: str):
-        logger.info(f'{__class__.__name__}.copy_helm_values_as_env')
+        logger.debug(f'{__class__.__name__}.copy_helm_values_as_env')
         YamlWrite.as_env(yamlPath, self.envHelmFilePath)
 
     def fix_memory_format_in_env_helm(self):
-        logger.info(f'{__class__.__name__}.fix_memory_format_in_env')
+        logger.debug(f'{__class__.__name__}.fix_memory_format_in_env')
         envHelmVars: dict = EnvRead.as_dict(self.envHelmFilePath)
         for env, var in envHelmVars.items():
             if MEMORY_STRING.K8S.Ki in var:
@@ -95,7 +95,7 @@ class DockerComposeConfigurator(TasksetConfig):
         return self
 
     def copy_templates_to_cwd(self):
-        logger.info(f'{__class__.__name__}.copy_templates_to_cwd_path')
+        logger.debug(f'{__class__.__name__}.copy_templates_to_cwd_path')
         for yamlTemplate in self.buildYamls:
             templateYaml = os.path.join(self.templatePath, yamlTemplate)
             cwdYaml = os.path.join(self.cwdPath, yamlTemplate)
@@ -107,7 +107,7 @@ class DockerComposeConfigurator(TasksetConfig):
         return self
 
     def expandvars_in_templates(self):
-        logger.info(f'{__class__.__name__}.expandvars_in_templates')
+        logger.debug(f'{__class__.__name__}.expandvars_in_templates')
         for yamlTemplate in self.buildYamls:
             cwdYaml = os.path.join(self.cwdPath, yamlTemplate)
             FileExpandvarsWrite.by_envfile_to_file(self.envFilePath, cwdYaml, cwdYaml)
@@ -121,7 +121,7 @@ class DockerComposeConfigurator(TasksetConfig):
         return self
 
     def put_docker_compose_version(self):
-        logger.info(f'{__class__.__name__}.put_docker_compose_version')
+        logger.debug(f'{__class__.__name__}.put_docker_compose_version')
         for yamlTemplate in self.buildYamls:
             cwdYaml = os.path.join(self.cwdPath, yamlTemplate)
             cwdYamlText: str = FileRead.text(cwdYaml).replace(self.DOCKER_COMPOSE_VERSION, self.dockerComposeVersion)
@@ -130,16 +130,16 @@ class DockerComposeConfigurator(TasksetConfig):
 
     @staticmethod
     def main(DO_RELOAD, **configurationKwargs):
-        logger.info(f'{__class__.__name__}.main')
+        logger.debug(f'{__class__.__name__}.main')
 
-        helmConfig = HelmConfigurator.main(DO_RELOAD, **configurationKwargs)
+        helmConfig: HelmConfigurator = HelmConfigurator.main(DO_RELOAD, **configurationKwargs)
 
         dockerCompose = DockerComposeConfigurator(**configurationKwargs)
         if DO_RELOAD:
             if dockerCompose.is_reloaded():
                 return dockerCompose
 
-            dockerCompose.copy_helm_values_as_env_helm(helmConfig.projectValuesYaml)
+            dockerCompose.copy_helm_values_as_env_helm(helmConfig.chartValuesYaml)
             dockerCompose.fix_memory_format_in_env_helm()
             dockerCompose.merge_env_files_in_cwd()
             dockerCompose.copy_templates_to_cwd()
@@ -172,7 +172,7 @@ class DockerComposeExecutor(ExecutorAbstract, DockerComposeConfigurator):
     KEY_FOLLOW: str = 'follow'
 
     def __call__(self, subcommand=None) -> Executor:
-        logger.info(f'{__class__.__name__}.__call__')
+        logger.debug(f'{__class__.__name__}.__call__')
 
         return Executor(self.DOCKER_COMPOSE) \
             .with_cwd(self.cwdPath) \
@@ -180,28 +180,28 @@ class DockerComposeExecutor(ExecutorAbstract, DockerComposeConfigurator):
             .with_subcommand(subcommand)
 
     def run(self, *argv):
-        return self().with_args(*argv).spawn()
+        self().with_args(*argv).spawn()
 
     def build(self, *argv):
-        return self(self.BUILD).with_args(*argv).with_flags(self.KEY_PARALLEL).spawn()
+        self(self.BUILD).with_args(*argv).with_flags(self.KEY_PARALLEL).spawn()
 
     def up(self, *argv):
-        return self(self.UP).with_args(*argv).with_flags().spawn()
+        self(self.UP).with_args(*argv).with_flags(self.BUILD).spawn()
 
     def down(self, *argv):
-        return self(self.DOWN).with_args(*argv).with_flags(self.KEY_REMOVE_ORPHANS, self.KEY_VOLUMES).spawn()
+        self(self.DOWN).with_args(*argv).with_flags(self.KEY_REMOVE_ORPHANS, self.KEY_VOLUMES).spawn()
 
     def kill(self):
-        return self(self.KILL).spawn()
+        self(self.KILL).spawn()
 
     def pull(self, *argv):
-        return self(self.PULL).with_args(*argv).with_flags(self.KEY_PARALLEL).spawn()
+        self(self.PULL).with_args(*argv).with_flags(self.KEY_PARALLEL).spawn()
 
     def push(self, *argv):
-        return self(self.PUSH).with_args(*argv).spawn()
+        self(self.PUSH).with_args(*argv).spawn()
 
     def logs(self, *argv):
-        return self(self.LOGS).with_args(*argv).with_flags(self.KEY_TIMESTAMPS).spawn()
+        self(self.LOGS).with_flags(self.KEY_TIMESTAMPS).with_args(*argv).spawn()
 
 
 class DockerCompose(DockerComposeConfigurator):
@@ -209,52 +209,56 @@ class DockerCompose(DockerComposeConfigurator):
     @staticmethod
     def run(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.run')
-        return DockerComposeExecutor(**configurationKwargs).run(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).run(*runArgs)
 
     @staticmethod
     def build(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.build')
-        return DockerComposeExecutor(**configurationKwargs).build(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).build(*runArgs)
 
     @staticmethod
     def up(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.up')
-        return DockerComposeExecutor(**configurationKwargs).up(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).up(*runArgs)
 
     @staticmethod
     def down(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.down')
-        return DockerComposeExecutor(DO_RELOAD_HELM=False, **configurationKwargs).down(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).down(*runArgs)
 
     @staticmethod
     def kill(**configurationKwargs):
         logger.info(f'{__class__.__name__}.kill')
-        return DockerComposeExecutor(DO_RELOAD_HELM=False, **configurationKwargs).kill()
+        DockerComposeExecutor(**configurationKwargs).kill()
 
     @staticmethod
     def pull(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.pull')
-        return DockerComposeExecutor(**configurationKwargs).pull(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).pull(*runArgs)
 
     @staticmethod
     def push(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.pull')
-        return DockerComposeExecutor(**configurationKwargs).push(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).push(*runArgs)
 
     @staticmethod
     def logs(*runArgs, **configurationKwargs):
         logger.info(f'{__class__.__name__}.logs')
-        return DockerComposeExecutor(DO_RELOAD_HELM=False, **configurationKwargs).logs(*runArgs)
+        DockerComposeExecutor(**configurationKwargs).logs(*runArgs)
 
     @staticmethod
-    def install(*_, **configurationKwargs):
+    def install(**configurationKwargs):
         logger.info(f'{__class__.__name__}.install')
 
         flagDetach = '--' + DockerComposeExecutor.KEY_DETACH
         flagFollow = '--' + DockerComposeExecutor.KEY_FOLLOW
 
-        yield DockerCompose.down(**configurationKwargs)
-        yield DockerCompose.pull(DO_RELOAD_HELM=True, **configurationKwargs)
-        yield DockerCompose.build(DO_RELOAD_HELM=False, **configurationKwargs)
-        yield DockerCompose.up(flagDetach, DO_RELOAD_HELM=False, **configurationKwargs)
-        yield DockerCompose.logs(flagFollow, DO_RELOAD_HELM=False, **configurationKwargs)
+        doReload: bool = configurationKwargs['DO_RELOAD']
+        configurationKwargs['DO_RELOAD'] = False
+        DockerCompose.down(**configurationKwargs)
+        configurationKwargs['DO_RELOAD'] = doReload
+        DockerCompose.pull(**configurationKwargs)
+        configurationKwargs['DO_RELOAD'] = False
+        DockerCompose.build(**configurationKwargs)
+        DockerCompose.up(flagDetach, **configurationKwargs)
+        DockerCompose.logs(flagFollow, **configurationKwargs)

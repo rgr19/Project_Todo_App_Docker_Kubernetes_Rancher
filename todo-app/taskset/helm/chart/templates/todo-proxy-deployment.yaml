@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-proxy
+  labels:
+    app: todo-app
+    todo-app-deployment: todo-proxy
+spec:
+  replicas: {{ .Values.ROUTING.PROXY.REPLICAS }}
+  selector:
+    matchLabels:
+      todo-app-pod: todo-proxy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-proxy
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: todo-proxy
+          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-proxy:{{ .Values.ROUTING.PROXY.IMAGE.TAG }}
+          imagePullPolicy: {{ .Values.ROUTING.PROXY.IMAGE.PULLPOLICY }}
+          ports:
+            - containerPort: {{ .Values.ROUTING.PROXY.PORT.TARGET }}
+          resources:
+            limits:
+              memory: {{ .Values.ROUTING.PROXY.MEMORY }}

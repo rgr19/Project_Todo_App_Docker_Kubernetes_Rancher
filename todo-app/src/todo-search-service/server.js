@@ -17,40 +17,20 @@ app.use(
     })
 );
 
-function client_ping(client) {
-    // Ping the client to be sure Elastic is up
-    client.ping({
-        requestTimeout: 30000,
-    }, function (error) {
-        if (error) {
-            console.error('Something went wrong with Elasticsearch: ' + error);
-            return false;
-        } else {
-            console.log('Elasticsearch client connected');
-            return true;
-        }
-    });
-}
-
 // Elasticsearch Client Setup //////////////////////////////////////////////////////////////////////////////////////////
-function try_elastic_connect() {
-
-    let client;
-    client = new elasticsearch.Client({
-        hosts: [envProps.elasticHost]
-    });
-    if (!client_ping(client)) {
-        client = new elasticsearch.Client({
-            hosts: [envProps.elasticHost + ':' + envProps.elasticPort]
-        });
-    }
-    return client;
-}
-
-const elasticClient = try_elastic_connect();
-
+const elasticClient = new elasticsearch.Client({
+    hosts: [envProps.elasticHost + ':' + envProps.elasticPort, envProps.elasticHost]
+});
 // Ping the client to be sure Elastic is up
-client_ping(elasticClient);
+elasticClient.ping({
+    requestTimeout: 30000,
+}, function (error) {
+    if (error) {
+        console.error('Something went wrong with Elasticsearch: ' + error);
+    } else {
+        console.log('Elasticsearch client connected');
+    }
+});
 
 // Set up the API routes ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,4 +70,3 @@ app.route('/api/v1/search').post((req, res) => {
 app.listen(port, () => {
     console.log('Todo Search Service started!');
 });
-

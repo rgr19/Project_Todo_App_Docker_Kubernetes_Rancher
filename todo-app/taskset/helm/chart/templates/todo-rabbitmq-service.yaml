@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-rabbitmq
+  labels:
+    app: todo-app
+    todo-app-service: todo-rabbitmq
+spec:
+  type: ClusterIP
+  selector:
+    todo-app-pod: todo-rabbitmq
+  ports:
+    - name: {{ .Values.BACKEND.STATELESS.RABBITMQ.PORT.NAME.AMQP }}
+      port:  {{ .Values.BACKEND.STATELESS.RABBITMQ.PORT.CLUSTER.AMQP }}
+      targetPort: {{ .Values.BACKEND.STATELESS.RABBITMQ.PORT.TARGET.AMQP }}
+

@@ -1,0 +1,7 @@
+"apiVersion": "v2"
+"appVersion": "1.16.0"
+"description": "A Helm chart for Todo App solution in Kubernetes"
+"name": "todo-app"
+"type": "application"
+"version": "${CHART_VERSION}"
+

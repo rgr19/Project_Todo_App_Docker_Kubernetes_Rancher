@@ -2,6 +2,7 @@
 
 import abc
 import logging
+import os
 import subprocess
 from typing import Union
 
@@ -14,7 +15,7 @@ class ExecutorOutputParser(object):
     stdout: str = ''
     stderr: str = ''
 
-    def __init__(self, stdout, stderr, returncode):
+    def __init__(self, stdout=b'', stderr=b'', returncode=0):
         if stdout:
             self.stdout = stdout.decode("utf-8")
         if stderr:
@@ -38,29 +39,23 @@ class ExecutorOutputParser(object):
             return
 
         if self.stdout:
-            print("#" * 100)
-            print("#### STDOUT : ")
-            print("#" * 100)
+            print("=" * 50, " STDOUT ", "=" * 50)
             print(self.stdout)
-            print("#" * 100)
-            print()
+            print("=" * 110)
         if self.stderr:
-            print("#" * 100)
-            print("#### STDERR :")
-            print("#" * 100)
+            print("=" * 50, " STDERR ", "=" * 50)
             print(self.stderr)
-            print("#" * 100)
-            print()
+            print("=" * 110)
 
 
 class Executor(object):
 
-    def __init__(self, *command: str):
+    def __init__(self, command: Union[list, tuple, set, str]):
         self.cmd: list = []
         self.cwd: Union[None, str] = None
         self.with_command(command)
 
-    def with_command(self, command):
+    def with_command(self, command: Union[list, tuple, set, str]):
         self.cmd: list = []
         if isinstance(command, (list, tuple, set)):
             self.cmd.extend(command)
@@ -70,7 +65,7 @@ class Executor(object):
             raise TypeError(f"Wrong type for 'command' : {command}")
         return self
 
-    def with_subcommand(self, subcommand=None):
+    def with_subcommand(self, subcommand: str = None):
         if subcommand:
             self.cmd.append(subcommand)
         return self
@@ -81,6 +76,8 @@ class Executor(object):
 
     def with_args(self, *args):
         for arg in args:
+            if not arg:
+                continue
             for split in arg.split():
                 self.cmd.append(split)
         return self
@@ -108,32 +105,51 @@ class Executor(object):
             self.cmd.append(f'--{arg}')
         return self
 
-    def exec(self, ) -> ExecutorOutputParser:
+    def exec(self, doUntilOk=False, exitOnError=True) -> str:
         logger.info(f'{self.__class__.__name__} begin EXEC : {self.cmd} in CWD: {self.cwd}')
         if not self.cmd:
-            raise Exception(f"No command provided CMD: {self.cmd}")
+            logger.exception(f"No command provided CMD: {self.cmd}")
+            exit(1)
         try:
-            process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.cwd)
-            stdout, stderr = process.communicate()
+            if os.environ['DRY_RUN']:
+                out = ExecutorOutputParser(b'DRY_RUN')
+            else:
+                process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.cwd)
+                stdout, stderr = process.communicate()
+                out = ExecutorOutputParser(stdout, stderr, process.returncode)
+                if doUntilOk and out.returncode:
+                    logger.error(f"Subprocess failed with returncode: {out.returncode}. Try again...")
+                    self.exec(doUntilOk)
+                out.print()
+                if out.returncode:
+                    logger.exception(f"Subprocess returned with exitcode {out.returncode}")
+                    if exitOnError:
+                        exit(1)
             logger.info(f'{self.__class__.__name__} end EXEC : {self.cmd} in CWD: {self.cwd}')
-            if process.returncode:
-                logger.error(f"Subprocess returned with exitcode {process.returncode}")
-            return ExecutorOutputParser(stdout, stderr, process.returncode)
-        except KeyboardInterrupt:
-            logger.error(f'{self.__class__.__name__} keyboard interrupt in EXEC : {self.cmd} in CWD: {self.cwd}')
+            return out.get()
 
-    def spawn(self) -> int:
+        except KeyboardInterrupt:
+            logger.exception(f'{self.__class__.__name__} keyboard interrupt in EXEC : {self.cmd} in CWD: {self.cwd}')
+            exit(1)
+
+    def spawn(self, exitOnError=True) -> None:
         logger.info(f'{self.__class__.__name__} begin SPAWN : {self.cmd} in CWD: {self.cwd}')
         if not self.cmd:
-            raise Exception(f"No command provided CMD: {self.cmd}")
+            logger.exception(f"No command provided CMD: {self.cmd}")
+            exit(1)
         try:
-            returncode = subprocess.check_call(self.cmd, cwd=self.cwd)
-            logger.info(f'{self.__class__.__name__} end EXEC')
-            if returncode:
-                logger.error(f"Subprocess returned with exitcode {returncode}")
-            return returncode
+            if not os.environ['DRY_RUN']:
+                returncode = subprocess.check_call(self.cmd, cwd=self.cwd)
+                out = ExecutorOutputParser(returncode=returncode)
+                out.print()
+                if returncode:
+                    logger.exception(f"Subprocess returned with exitcode {returncode}")
+                    if exitOnError:
+                        exit(1)
+            logger.info(f'{self.__class__.__name__} end SPAWN : {self.cmd} in CWD: {self.cwd}')
         except KeyboardInterrupt:
-            logger.error(f'{self.__class__.__name__} keyboard interrupt in SPAWN : {self.cmd} in CWD: {self.cwd}')
+            logger.exception(f'{self.__class__.__name__} keyboard interrupt in SPAWN : {self.cmd} in CWD: {self.cwd}')
+            exit(1)
 
 
 class ExecutorAbstract(abc.ABC):

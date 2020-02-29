@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  labels:
+    app: todo-app
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: todo-proxy
+              servicePort: {{ .Values.ROUTING.PROXY.PORT.TARGET }}
+
+
+

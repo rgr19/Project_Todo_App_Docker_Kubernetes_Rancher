@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-api-gateway
+  labels:
+    app: todo-app
+    todo-app-service: todo-api-gateway
+spec:
+  type: ClusterIP
+  selector:
+    todo-app-pod: todo-api-gateway
+  ports:
+    - name: {{ .Values.ROUTING.APIGATEWAY.PORT.NAME }}
+      port: {{ .Values.ROUTING.APIGATEWAY.PORT.CLUSTER }}
+      targetPort: {{ .Values.ROUTING.APIGATEWAY.PORT.TARGET }}
+

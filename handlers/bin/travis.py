@@ -37,7 +37,7 @@ class TravisConfigurator(TasksetConfig):
 
     def __init__(self, **configurationVariables):
         super().__init__(**configurationVariables)
-        logger.info(f'{__class__.__name__}.__init__')
+        logger.debug(f'{__class__.__name__}.__init__')
 
         self.taskPath: str = os.path.join(self.PATH_TASKSET, self.TRAVIS)
         self.templatePath: str = os.path.join(self.taskPath, self.TEMPLATE)
@@ -52,7 +52,7 @@ class TravisConfigurator(TasksetConfig):
         os.makedirs(self.templatePath, exist_ok=True)
 
     def save_github_config_to_envfiles(self, **configurationKwargs):
-        logger.info(f'{__class__.__name__}.save_github_config_to_envfiles')
+        logger.debug(f'{__class__.__name__}.save_github_config_to_envfiles')
         if not configurationKwargs:
             logger.exception("Dict of `configurationKwargs` can not be empty.")
         gitBranch = GitExecutor().branch()
@@ -62,7 +62,7 @@ class TravisConfigurator(TasksetConfig):
         return self
 
     def merge_travis_templates_to_root(self, taskMode: str = None):
-        logger.info(f'{__class__.__name__}.copy_travis_templates_to_cwd')
+        logger.debug(f'{__class__.__name__}.copy_travis_templates_to_cwd')
         if not taskMode:
             logger.exception("Task mode can note be None.")
 
@@ -80,7 +80,7 @@ class TravisConfigurator(TasksetConfig):
         return self
 
     def load_envvars_and_secrets(self, taskMode: str = None, *customSecrets: str):
-        logger.info(f'{__class__.__name__}.load_envvars_and_secrets')
+        logger.debug(f'{__class__.__name__}.load_envvars_and_secrets')
         if not taskMode:
             logger.exception("Task mode can note be None.")
 
@@ -103,9 +103,9 @@ class TravisConfigurator(TasksetConfig):
 
     @staticmethod
     def main(DO_RELOAD, **configurationKwargs):
-        logger.info(f'{__class__.__name__}.main')
+        logger.debug(f'{__class__.__name__}.main')
 
-        travis = TravisConfigurator(**configurationKwargs)
+        travis: TravisConfigurator = TravisConfigurator(**configurationKwargs)
 
         if DO_RELOAD:
             if travis.is_reloaded():
@@ -134,28 +134,28 @@ class GitExecutor(ExecutorAbstract):
         return Executor(self.GIT).with_subcommand(subcommand)
 
     def branch(self):
-        logger.info(f'{__class__.__name__}.branch')
-        return self(self.REV_PARSE).with_kwarg(self.ABBREV_REF, self.HEAD).exec().get()
+        logger.debug(f'{__class__.__name__}.branch')
+        return self(self.REV_PARSE).with_kwarg(self.ABBREV_REF, self.HEAD).exec()
 
     def user_name(self):
-        logger.info(f'{__class__.__name__}.user_name')
-        return self(self.CONFIG).with_args(self.USER_NAME).exec().get()
+        logger.debug(f'{__class__.__name__}.user_name')
+        return self(self.CONFIG).with_args(self.USER_NAME).exec()
 
     def add_all(self):
-        logger.info(f'{__class__.__name__}.add_all')
-        return self(self.ADD).with_flags(self.ALL).spawn()
+        logger.debug(f'{__class__.__name__}.add_all')
+        self(self.ADD).with_flags(self.ALL).spawn()
 
     def commit_msg(self, msg: str, *_):
-        logger.info(f'{__class__.__name__}.commit_msg => MSG : {msg}')
-        return self(self.COMMIT).with_kwarg(self.MESSAGE, msg).spawn()
+        logger.debug(f'{__class__.__name__}.commit_msg => MSG : {msg}')
+        self(self.COMMIT).with_kwarg(self.MESSAGE, msg).spawn()
 
     def push_origin(self):
         branch: str = self.branch()
-        logger.info(f'{__class__.__name__}.push_origin => BRANCH: {branch}')
-        return self(self.PUSH).with_args(self.ORIGIN, branch).spawn()
+        logger.debug(f'{__class__.__name__}.push_origin => BRANCH: {branch}')
+        self(self.PUSH).with_args(self.ORIGIN, branch).spawn()
 
     def task(self, taskMode, GIT_MESSAGE: str = None, ):
-        logger.info(f'{__class__.__name__}.task => {taskMode}, GIT_MESSAGE => {GIT_MESSAGE}')
+        logger.debug(f'{__class__.__name__}.task => {taskMode}, GIT_MESSAGE => {GIT_MESSAGE}')
         if taskMode is None:
             logger.exception("Task mode can not be None.")
         if not GIT_MESSAGE:
@@ -178,20 +178,19 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
         return Executor(self.TRAVIS).with_cwd(self.cwdPath).with_subcommand(subcommand)
 
     def encrypt(self, *secrets):
-        logger.info(f'{__class__.__name__}.encrypt')
+        logger.debug(f'{__class__.__name__}.encrypt')
         self(self.ENCRYPT).with_args(*secrets).with_kwarg(self.ADD, self.ENV_GLOBAL).with_flags(self.OVERRIDE, self.ORG).spawn()
 
     def basic(self, GIT_MESSAGE: str, *secrets: str):
-        logger.info(f'{__class__.__name__}.basic')
+        logger.debug(f'{__class__.__name__}.basic')
         self.task(GIT_MESSAGE, self.TASK_MODE_BASIC, *secrets)
 
     def aws(self, GIT_MESSAGE: str, *secrets: str):
-        logger.info(f'{__class__.__name__}.aws')
+        logger.debug(f'{__class__.__name__}.aws')
         self.task(GIT_MESSAGE, self.TASK_MODE_AWS, *secrets)
 
     def task(self, GIT_MESSAGE: str, taskMode, *secrets: str):
-        logger.info(f'{__class__.__name__}.main')
-
+        logger.debug(f'{__class__.__name__}.main')
         self.merge_travis_templates_to_root(taskMode)
         self.load_envvars_and_secrets(taskMode, *secrets)
         self.encrypt(*self.envVarsSecrets)

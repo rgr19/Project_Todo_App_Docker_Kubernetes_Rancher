@@ -5,5 +5,5 @@ module.exports = {
     postgresDatabase: process.env.POSTGRES_DB,
     postgresUser: process.env.POSTGRES_USER,
     postgresPassword: process.env.POSTGRES_PASSWORD,
-    rabbitmqUrl: process.env.RABBITMQ_URL
+    rabbitmqUrl: process.env.RABBITMQ_DEFAULT_URL
 };

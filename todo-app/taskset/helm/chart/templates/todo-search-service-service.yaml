@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ template "todo-app.namespace" . }}
+  name: todo-search-service
+  labels:
+    app: todo-app
+    todo-app-service: todo-search-service
+spec:
+  type: ClusterIP
+  selector:
+    todo-app-pod: todo-search-service
+  ports:
+    - name: "{{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.PORT.NAME }}"
+      port: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.PORT.CLUSTER }}
+      targetPort: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.PORT.TARGET }}
+

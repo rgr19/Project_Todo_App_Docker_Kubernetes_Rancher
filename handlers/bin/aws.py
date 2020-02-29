@@ -16,7 +16,7 @@ logger.info("Hello logging!")
 
 class AwsConfigurator(TasksetConfig):
     AWS: str = 'aws'
-    TEMPLATE: str = 'template'
+    DATA: str = 'template'
     TEMP_DIR: str = 'temporary'
     ENV_FILE: str = '.env'
     ENV_AWS_FILE: str = ENV_FILE + '.aws'
@@ -90,14 +90,14 @@ class AwsConfigurator(TasksetConfig):
     def main(AWS_APP_ENV=None, DO_RELOAD=False, **configurationKwargs):
         logger.info(f'{__class__.__name__}.main')
 
-        helmConfig = HelmConfigurator.main(DO_RELOAD, **configurationKwargs)
+        helmConfig: HelmConfigurator = HelmConfigurator.main(DO_RELOAD, **configurationKwargs)
 
         awsConfig = AwsConfigurator(**configurationKwargs)
         if DO_RELOAD:
             if awsConfig.is_reloaded():
                 return awsConfig
 
-            awsConfig.copy_helm_values_as_env_helm(helmConfig.projectValuesYaml)
+            awsConfig.copy_helm_values_as_env_helm(helmConfig.chartValuesYaml)
             awsConfig.fix_memory_format_in_env_helm()
             awsConfig.copy_aws_templates_to_cwd()
             awsConfig.merge_env_files_in_cwd()
@@ -130,7 +130,7 @@ class AwsExecutor(ExecutorAbstract, AwsConfigurator):
 
     def list(self, *argv):
         logger.info(f'{__class__.__name__}.list')
-        return self.__call__(self.USE).with_args(*argv).exec().stdout_as_list()
+        return self.__call__(self.USE).with_args(*argv).exec()
 
     def use(self, awsEnv=None, *argv):
         logger.info(f'{__class__.__name__}.use')

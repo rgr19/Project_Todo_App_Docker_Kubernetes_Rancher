@@ -62,7 +62,7 @@ services:
       - REDIS_PORT=6379
       - RABBITMQ_DEFAULT_USER=todo
       - RABBITMQ_DEFAULT_PASS=todo1234
-      - RABBITMQ_URL=amqp://todo:todo1234@todo-rabbitmq
+      - RABBITMQ_DEFAULT_URL=amqp://todo:todo1234@todo-rabbitmq
       - STORAGE_SERVICE_URL=http://todo-storage-service:3000
     depends_on:
       - todo-redis
@@ -92,7 +92,7 @@ services:
     environment:
       - ELASTICSEARCH_HOST=todo-elastic
       - ELASTICSEARCH_PORT=9200
-      - RABBITMQ_URL=amqp://todo:todo1234@todo-rabbitmq
+      - RABBITMQ_DEFAULT_URL=amqp://todo:todo1234@todo-rabbitmq
       - RABBITMQ_DEFAULT_USER=todo
       - RABBITMQ_DEFAULT_PASS=todo1234
     depends_on:
@@ -129,7 +129,7 @@ services:
       - POSTGRES_PASSWORD=todo1234
       - RABBITMQ_DEFAULT_USER=todo
       - RABBITMQ_DEFAULT_PASS=todo1234
-      - RABBITMQ_URL=amqp://todo:todo1234@todo-rabbitmq
+      - RABBITMQ_DEFAULT_URL=amqp://todo:todo1234@todo-rabbitmq
     depends_on:
       - todo-postgres
       - todo-rabbitmq
@@ -163,7 +163,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=todo
       - RABBITMQ_DEFAULT_PASS=todo1234
-      - RABBITMQ_URL=amqp://todo:todo1234@todo-rabbitmq
+      - RABBITMQ_DEFAULT_URL=amqp://todo:todo1234@todo-rabbitmq
       - CACHE_SERVICE_URL=http://todo-cache-service:3000
       - SEARCH_SERVICE_URL=http://todo-search-service:3000
       - STORAGE_SERVICE_URL=http://todo-storage-service:3000
