@@ -29,6 +29,8 @@ spec:
           ports:
             - containerPort: {{ .Values.BACKEND.STATEFUL.REDIS.PORT.TARGET }}
           envFrom:
+            - configMapRef:
+                name: todo-config
             - secretRef:
                 name: todo-secret
           resources:

@@ -1,5 +1,5 @@
 NAME: todo-app
-LAST DEPLOYED: Sun Mar  1 11:26:00 2020
+LAST DEPLOYED: Sun Mar 15 12:24:38 2020
 NAMESPACE: default
 STATUS: pending-install
 REVISION: 1
@@ -34,7 +34,7 @@ BACKEND:
       HOST: todo-postgres
       IMAGE:
         PULLPOLICY: Always
-        TAG: "0.13"
+        TAG: "0.14"
       MEMORY: 1Gi
       PORT:
         CLUSTER: "5432"
@@ -64,14 +64,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 128Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-cache-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 128Mi
         PORT:
           CLUSTER: "3000"
@@ -105,14 +105,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 256Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-search-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 256Mi
         PORT:
           CLUSTER: "3000"
@@ -124,14 +124,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 128Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-storage-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.13"
+          TAG: "0.14"
         MEMORY: 128Mi
         PORT:
           CLUSTER: "3000"
@@ -143,7 +143,7 @@ FRONTEND:
   VIEW:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.13"
+      TAG: "0.14"
     MEMORY: 768Mi
     PORT:
       CLUSTER:
@@ -160,7 +160,7 @@ ROUTING:
   APIGATEWAY:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.13"
+      TAG: "0.14"
     MEMORY: 128Mi
     PORT:
       CLUSTER: "3000"
@@ -170,7 +170,7 @@ ROUTING:
   PROXY:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.13"
+      TAG: "0.14"
     MEMORY: 128Mi
     PORT:
       CLUSTER: "8080"
@@ -187,10 +187,10 @@ VARS:
     BRANCH: 010_todo_app_with_helm_for_kubernetes
     USER: rgr19
   IMAGES:
-    VERSION: "0.13"
+    VERSION: "0.14"
   NAMESPACE: todo
   PROJECT:
-    VERSION: 0.0.3
+    VERSION: 0.0.1
   RUNTIME:
     TYPE: helm
 
@@ -201,13 +201,13 @@ MANIFEST:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: todo-app-0-0-3
+  name: todo-app-0-0-1
 ---
 # Source: todo-app/templates/todo-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-secret
 type: Opaque
 stringData:
@@ -223,7 +223,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-config
 data:
   REDIS_CLUSTER_PORT: "6379"
@@ -240,7 +240,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: elastic-data-pvc
 spec:
   #  storageClassName: manual
@@ -254,7 +254,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: postgres-data-pvc
 spec:
   #  storageClassName: manual
@@ -268,7 +268,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-api-gateway
   labels:
     app: todo-app
@@ -286,7 +286,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-cache-service
   labels:
     app: todo-app
@@ -304,7 +304,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-elastic
   labels:
     app: todo-app
@@ -325,7 +325,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-postgres
   labels:
     app: todo-app
@@ -343,7 +343,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-proxy
   labels:
     app: todo-app
@@ -361,7 +361,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-rabbitmq-management
   labels:
     app: todo-app
@@ -379,7 +379,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-rabbitmq
   labels:
     app: todo-app
@@ -397,7 +397,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-redis
   labels:
     app: todo-app
@@ -417,7 +417,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-search-service
   labels:
     app: todo-app
@@ -435,7 +435,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-storage-service
   labels:
     app: todo-app
@@ -453,7 +453,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-view
   labels:
     app: todo-app
@@ -471,7 +471,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-api-gateway
   labels:
     app: todo-app
@@ -499,7 +499,7 @@ spec:
       containers:
         - name: todo-api-gateway
           imagePullPolicy: Always
-          image: onceawaken/todo-api-gateway:0.13
+          image: onceawaken/todo-api-gateway:0.14
           envFrom:
             - configMapRef:
                 name: todo-config
@@ -515,7 +515,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-cache-ingestion
   labels:
     app: todo-app
@@ -542,7 +542,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
       containers:
         - name: todo-cache-ingestion
-          image: onceawaken/todo-cache-ingestion:0.13
+          image: onceawaken/todo-cache-ingestion:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -557,7 +557,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-cache-service
   labels:
     app: todo-app
@@ -580,7 +580,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-cache-service
-          image: onceawaken/todo-cache-service:0.13
+          image: onceawaken/todo-cache-service:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -597,7 +597,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-elastic
   labels:
     app: todo-app
@@ -664,7 +664,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-postgres
   labels:
     app: todo-app
@@ -691,7 +691,7 @@ spec:
                 name: todo-secret
       containers:
         - name: todo-postgres
-          image: onceawaken/todo-postgres:0.13
+          image: onceawaken/todo-postgres:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -745,7 +745,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-proxy
   labels:
     app: todo-app
@@ -768,7 +768,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-proxy
-          image: onceawaken/todo-proxy:0.13
+          image: onceawaken/todo-proxy:0.14
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -780,7 +780,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-rabbitmq
   labels:
     app: todo-app
@@ -853,7 +853,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-redis
   labels:
     app: todo-app
@@ -911,7 +911,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-search-ingestion
   labels:
     app: todo-app
@@ -941,7 +941,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
       containers:
         - name: todo-search-ingestion
-          image: onceawaken/todo-search-ingestion:0.13
+          image: onceawaken/todo-search-ingestion:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -956,7 +956,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-search-service
   labels:
     app: todo-app
@@ -983,7 +983,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
       containers:
         - name: todo-search-service
-          image: onceawaken/todo-search-service:0.13
+          image: onceawaken/todo-search-service:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -1000,7 +1000,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-storage-ingestion
   labels:
     app: todo-app
@@ -1027,7 +1027,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
       containers:
         - name: todo-storage-ingestion
-          image: onceawaken/todo-storage-ingestion:0.13
+          image: onceawaken/todo-storage-ingestion:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -1042,7 +1042,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-storage-service
   labels:
     app: todo-app
@@ -1064,7 +1064,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: onceawaken/todo-storage-service:0.13
+        - image: onceawaken/todo-storage-service:0.14
           imagePullPolicy: Always
           name: todo-storage-service
           envFrom:
@@ -1088,7 +1088,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-view
   labels:
     app: todo-app
@@ -1111,7 +1111,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-view
-          image: onceawaken/todo-view:0.13
+          image: onceawaken/todo-view:0.14
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -1130,7 +1130,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  namespace: todo-app-0-0-3
+  namespace: todo-app-0-0-1
   name: todo-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -1144,8 +1144,4 @@ spec:
             backend:
               serviceName: todo-proxy
               servicePort: 80
-          - path: /rmq
-            backend:
-              serviceName: todo-rabbitmq-management
-              servicePort: 15672
 

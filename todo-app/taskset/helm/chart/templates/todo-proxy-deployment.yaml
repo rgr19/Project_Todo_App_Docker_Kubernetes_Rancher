@@ -31,3 +31,9 @@ spec:
           resources:
             limits:
               memory: {{ .Values.ROUTING.PROXY.MEMORY }}
+
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret

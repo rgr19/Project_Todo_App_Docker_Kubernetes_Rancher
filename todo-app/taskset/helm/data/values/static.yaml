@@ -5,7 +5,7 @@
       "IMAGE":
         "PULLPOLICY": "Always"
         "TAG": "6.6.1"
-      "MEMORY": "2.5Gi"
+      "MEMORY": "2560Mi"
       "PORT":
         "CLUSTER":
           "HTTP": "9200"

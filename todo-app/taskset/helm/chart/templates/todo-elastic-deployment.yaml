@@ -19,10 +19,6 @@ spec:
         todo-app-pod: todo-elastic
     spec:
       restartPolicy: Always
-      securityContext:
-        fsGroup: 1000
-        runAsUser: 1000
-        runAsGroup: 1000
       containers:
         - name: todo-elastic
           image: elasticsearch:{{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.IMAGE.TAG }}
@@ -43,22 +39,30 @@ spec:
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: elastic-data
+          # start first and disable readiness plus liveness until started
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.PORT.TARGET.TRANSPORT }}
+            failureThreshold: 720
+            timeoutSeconds: 1
+            periodSeconds: 1
+          # The kubelet uses readiness probes to know when a Container is ready to start accepting traffic.
           readinessProbe:
             httpGet:
               path: /
               port: {{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.PORT.TARGET.HTTP }}
               scheme: HTTP
-            timeoutSeconds: 6
+            periodSeconds: 6
+            timeoutSeconds: 1
             successThreshold: 3
+          #  The kubelet uses liveness probes to know when to restart a Container.
           livenessProbe:
             httpGet:
               path: /_cluster/health
               port: {{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.PORT.TARGET.HTTP }}
               scheme: HTTP
-            initialDelaySeconds: 360
-            timeoutSeconds: 6
-          securityContext:
-            allowPrivilegeEscalation: false
+            periodSeconds: 6
+            timeoutSeconds: 1
       volumes:
         - name: elastic-data
           persistentVolumeClaim:

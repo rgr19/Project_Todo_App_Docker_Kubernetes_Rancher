@@ -26,6 +26,11 @@ spec:
         - name: init-elastic
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
       containers:
         - name: todo-search-service
           image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-service:{{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.TAG }}

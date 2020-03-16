@@ -3,13 +3,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: todo-app-0-0-1
+  name: todo-app-0-0-2
 ---
 # Source: todo-app/templates/todo-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-secret
 type: Opaque
 stringData:
@@ -25,7 +25,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-config
 data:
   REDIS_CLUSTER_PORT: "6379"
@@ -42,7 +42,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: elastic-data-pvc
 spec:
   #  storageClassName: manual
@@ -56,7 +56,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: postgres-data-pvc
 spec:
   #  storageClassName: manual
@@ -70,7 +70,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-api-gateway
   labels:
     app: todo-app
@@ -88,7 +88,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-cache-service
   labels:
     app: todo-app
@@ -106,7 +106,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-elastic
   labels:
     app: todo-app
@@ -127,7 +127,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-postgres
   labels:
     app: todo-app
@@ -145,7 +145,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-proxy
   labels:
     app: todo-app
@@ -163,7 +163,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-rabbitmq-management
   labels:
     app: todo-app
@@ -181,7 +181,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-rabbitmq
   labels:
     app: todo-app
@@ -199,7 +199,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-redis
   labels:
     app: todo-app
@@ -219,7 +219,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-search-service
   labels:
     app: todo-app
@@ -237,7 +237,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-storage-service
   labels:
     app: todo-app
@@ -255,7 +255,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-view
   labels:
     app: todo-app
@@ -273,7 +273,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-api-gateway
   labels:
     app: todo-app
@@ -317,7 +317,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-cache-ingestion
   labels:
     app: todo-app
@@ -359,7 +359,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-cache-service
   labels:
     app: todo-app
@@ -399,7 +399,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-elastic
   labels:
     app: todo-app
@@ -425,6 +425,11 @@ spec:
         - name: todo-elastic
           image: elasticsearch:6.6.1
           imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
           env:
             - name: discovery.type
               value: single-node
@@ -437,7 +442,7 @@ spec:
               containerPort: 9300
           resources:
             limits:
-              memory: 2.5Gi
+              memory: 2560Mi
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: elastic-data
@@ -446,7 +451,7 @@ spec:
               path: /
               port: 9200
               scheme: HTTP
-            timeoutSeconds: 6
+            timeoutSeconds: 12
             successThreshold: 3
           livenessProbe:
             httpGet:
@@ -466,7 +471,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-postgres
   labels:
     app: todo-app
@@ -547,7 +552,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-proxy
   labels:
     app: todo-app
@@ -577,12 +582,18 @@ spec:
           resources:
             limits:
               memory: 128Mi
+
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
 ---
 # Source: todo-app/templates/todo-rabbitmq-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-rabbitmq
   labels:
     app: todo-app
@@ -655,7 +666,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-redis
   labels:
     app: todo-app
@@ -683,6 +694,8 @@ spec:
           ports:
             - containerPort: 6379
           envFrom:
+            - configMapRef:
+                name: todo-config
             - secretRef:
                 name: todo-secret
           resources:
@@ -713,7 +726,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-search-ingestion
   labels:
     app: todo-app
@@ -738,9 +751,19 @@ spec:
         - name: init-rabbitmq
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
         - name: init-elastic
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
       containers:
         - name: todo-search-ingestion
           image: onceawaken/todo-search-ingestion:0.14
@@ -758,7 +781,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-search-service
   labels:
     app: todo-app
@@ -783,6 +806,11 @@ spec:
         - name: init-elastic
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
       containers:
         - name: todo-search-service
           image: onceawaken/todo-search-service:0.14
@@ -802,7 +830,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-storage-ingestion
   labels:
     app: todo-app
@@ -844,7 +872,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-storage-service
   labels:
     app: todo-app
@@ -890,7 +918,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-view
   labels:
     app: todo-app
@@ -932,7 +960,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  namespace: todo-app-0-0-1
+  namespace: todo-app-0-0-2
   name: todo-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
