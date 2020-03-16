@@ -128,8 +128,8 @@ class SetupParserTasks(object):
         self.setup_docker_compose_parser()
         self.setup_travis_parser()
         self.setup_aws_parser()
-        self.setup_kompose_parser()
-        self.setup_k8s_parser()
+        # self.setup_kompose_parser()
+        # self.setup_k8s_parser()
         self.setup_automate()
 
     def setup_docker_compose_parser(self):
