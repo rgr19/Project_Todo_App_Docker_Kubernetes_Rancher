@@ -27,3 +27,7 @@ npm_install_success.txt
 !.elasticbeanstalk/*.cfg.yaml
 !.elasticbeanstalk/*.global.yaml
 /.secretfiles/
+
+# Python files
+__pycache__
+*.pyc
