@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-proxy
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-proxy:{{ .Values.ROUTING.PROXY.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-proxy:{{ .Values.ROUTING.PROXY.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.ROUTING.PROXY.IMAGE.PULLPOLICY }}
           ports:
             - containerPort: {{ .Values.ROUTING.PROXY.PORT.TARGET }}

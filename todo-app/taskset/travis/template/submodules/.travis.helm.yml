@@ -1,0 +1,29 @@
+dist: xenial
+# Install Helm and Kubeval
+before_install:
+  - bash install/helm_kubeval_install.sh
+
+# Run some tests
+script:
+  # Lint Todo App chart syntax
+  - helm lint charts/todo-app
+  # Validate generated K8s manifests
+  - mkdir manifests
+  - helm template charts/todo-app --output-dir manifests
+  - bash scripts/kubeval_validate_manifest.sh
+
+# Build Todo App Chart and update Chart Index
+after_success:
+  - mkdir distribution
+  - helm package charts/todo-app --destination distribution/
+  - helm repo index --url $GITHUB_PAGES_URL/todo-app-helm-chart ./distribution/
+
+# Publish new Todo App Chart
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep_history: true
+  local_dir: ./distribution
+  on:
+    branch: master

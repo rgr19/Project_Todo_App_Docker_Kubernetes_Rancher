@@ -4,6 +4,6 @@
 (
 CWD=$PWD
 cd taskset
-CWD=$CWD WDIR='aws' ./aws.sh "$@"
+CWD=$CWD WDIR='aws_task' ./aws_task.sh "$@"
 )
 

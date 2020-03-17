@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-redis
-          image: redis:{{ .Values.BACKEND.STATEFUL.REDIS.IMAGE.TAG }}
+          image: 'redis:{{ .Values.BACKEND.STATEFUL.REDIS.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATEFUL.REDIS.IMAGE.PULLPOLICY }}
           ports:
             - containerPort: {{ .Values.BACKEND.STATEFUL.REDIS.PORT.TARGET }}

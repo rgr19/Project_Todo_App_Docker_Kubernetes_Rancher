@@ -1,5 +1,5 @@
 NAME: todo-app
-LAST DEPLOYED: Sun Mar 15 12:24:38 2020
+LAST DEPLOYED: Wed Mar 18 15:05:10 2020
 NAMESPACE: default
 STATUS: pending-install
 REVISION: 1
@@ -15,7 +15,7 @@ BACKEND:
       IMAGE:
         PULLPOLICY: Always
         TAG: 6.6.1
-      MEMORY: 2.5Gi
+      MEMORY: 2560Mi
       PORT:
         CLUSTER:
           HTTP: "9200"
@@ -34,7 +34,7 @@ BACKEND:
       HOST: todo-postgres
       IMAGE:
         PULLPOLICY: Always
-        TAG: "0.14"
+        TAG: "0.1"
       MEMORY: 1Gi
       PORT:
         CLUSTER: "5432"
@@ -64,14 +64,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 128Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-cache-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 128Mi
         PORT:
           CLUSTER: "3000"
@@ -105,14 +105,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 256Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-search-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 256Mi
         PORT:
           CLUSTER: "3000"
@@ -124,14 +124,14 @@ BACKEND:
       INGESTION:
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 128Mi
         REPLICAS: "1"
       SERVICE:
         HOST: todo-storage-service
         IMAGE:
           PULLPOLICY: Always
-          TAG: "0.14"
+          TAG: "0.1"
         MEMORY: 128Mi
         PORT:
           CLUSTER: "3000"
@@ -143,7 +143,7 @@ FRONTEND:
   VIEW:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.14"
+      TAG: "0.1"
     MEMORY: 768Mi
     PORT:
       CLUSTER:
@@ -160,7 +160,7 @@ ROUTING:
   APIGATEWAY:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.14"
+      TAG: "0.1"
     MEMORY: 128Mi
     PORT:
       CLUSTER: "3000"
@@ -170,7 +170,7 @@ ROUTING:
   PROXY:
     IMAGE:
       PULLPOLICY: Always
-      TAG: "0.14"
+      TAG: "0.1"
     MEMORY: 128Mi
     PORT:
       CLUSTER: "8080"
@@ -187,7 +187,7 @@ VARS:
     BRANCH: 010_todo_app_with_helm_for_kubernetes
     USER: rgr19
   IMAGES:
-    VERSION: "0.14"
+    VERSION: "0.1"
   NAMESPACE: todo
   PROJECT:
     VERSION: 0.0.1
@@ -211,7 +211,9 @@ metadata:
   name: todo-secret
 type: Opaque
 stringData:
+  
   secrets.yaml: IkFXU19LRVlfSUQiOiAiQUtJQVVCR1NEU09TSU1LSkVSQ04iCiJBV1NfU0VDUkVUX0tFWSI6ICI0V1FOaFp2RUlPZGVjWmdERld3M0hBd21UK1NzMnpNK1kydVhNNFRzIgoiRE9DS0VSX0hVQl9QQVNTV09SRCI6ICJEYWlzeTEyMyEiCgoK
+  
   POSTGRES_PASSWORD: todo1234
   POSTGRES_DB: todo
   POSTGRES_USER: todo
@@ -499,7 +501,7 @@ spec:
       containers:
         - name: todo-api-gateway
           imagePullPolicy: Always
-          image: onceawaken/todo-api-gateway:0.14
+          image: 'onceawaken/todo-api-gateway:0.1'
           envFrom:
             - configMapRef:
                 name: todo-config
@@ -542,7 +544,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
       containers:
         - name: todo-cache-ingestion
-          image: onceawaken/todo-cache-ingestion:0.14
+          image: 'onceawaken/todo-cache-ingestion:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -580,7 +582,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-cache-service
-          image: onceawaken/todo-cache-service:0.14
+          image: 'onceawaken/todo-cache-service:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -615,13 +617,9 @@ spec:
         todo-app-pod: todo-elastic
     spec:
       restartPolicy: Always
-      securityContext:
-        fsGroup: 1000
-        runAsUser: 1000
-        runAsGroup: 1000
       containers:
         - name: todo-elastic
-          image: elasticsearch:6.6.1
+          image: 'elasticsearch:6.6.1'
           imagePullPolicy: Always
           env:
             - name: discovery.type
@@ -635,26 +633,34 @@ spec:
               containerPort: 9300
           resources:
             limits:
-              memory: 2.5Gi
+              memory: 2560Mi
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: elastic-data
+          # start first and disable readiness plus liveness until started
+          startupProbe:
+            tcpSocket:
+              port: 9300
+            failureThreshold: 720
+            timeoutSeconds: 1
+            periodSeconds: 1
+          # The kubelet uses readiness probes to know when a Container is ready to start accepting traffic.
           readinessProbe:
             httpGet:
               path: /
               port: 9200
               scheme: HTTP
-            timeoutSeconds: 6
+            periodSeconds: 6
+            timeoutSeconds: 1
             successThreshold: 3
+          #  The kubelet uses liveness probes to know when to restart a Container.
           livenessProbe:
             httpGet:
               path: /_cluster/health
               port: 9200
               scheme: HTTP
-            initialDelaySeconds: 360
-            timeoutSeconds: 6
-          securityContext:
-            allowPrivilegeEscalation: false
+            periodSeconds: 6
+            timeoutSeconds: 1
       volumes:
         - name: elastic-data
           persistentVolumeClaim:
@@ -691,7 +697,7 @@ spec:
                 name: todo-secret
       containers:
         - name: todo-postgres
-          image: onceawaken/todo-postgres:0.14
+          image: 'onceawaken/todo-postgres:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -768,13 +774,19 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-proxy
-          image: onceawaken/todo-proxy:0.14
+          image: 'onceawaken/todo-proxy:0.1'
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           resources:
             limits:
               memory: 128Mi
+
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
 ---
 # Source: todo-app/templates/todo-rabbitmq-deployment.yaml
 apiVersion: apps/v1
@@ -803,7 +815,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-rabbitmq
-          image: rabbitmq:3.7.13-management
+          image: 'rabbitmq:3.7.13-management'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -876,11 +888,13 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-redis
-          image: redis:5.0.3
+          image: 'redis:5.0.3'
           imagePullPolicy: Always
           ports:
             - containerPort: 6379
           envFrom:
+            - configMapRef:
+                name: todo-config
             - secretRef:
                 name: todo-secret
           resources:
@@ -936,12 +950,22 @@ spec:
         - name: init-rabbitmq
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
         - name: init-elastic
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
       containers:
         - name: todo-search-ingestion
-          image: onceawaken/todo-search-ingestion:0.14
+          image: 'onceawaken/todo-search-ingestion:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -981,9 +1005,14 @@ spec:
         - name: init-elastic
           image: busybox
           command: ['sh', '-c', 'until nslookup todo-elastic; do echo waiting for ElasticSearch; sleep 2; done;']
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secret
       containers:
         - name: todo-search-service
-          image: onceawaken/todo-search-service:0.14
+          image: 'onceawaken/todo-search-service:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -1027,7 +1056,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
       containers:
         - name: todo-storage-ingestion
-          image: onceawaken/todo-storage-ingestion:0.14
+          image: 'onceawaken/todo-storage-ingestion:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -1064,7 +1093,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: onceawaken/todo-storage-service:0.14
+        - image: 'onceawaken/todo-storage-service:0.1'
           imagePullPolicy: Always
           name: todo-storage-service
           envFrom:
@@ -1111,7 +1140,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-view
-          image: onceawaken/todo-view:0.14
+          image: 'onceawaken/todo-view:0.1'
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

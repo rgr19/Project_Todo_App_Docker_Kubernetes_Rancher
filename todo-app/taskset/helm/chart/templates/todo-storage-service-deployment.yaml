@@ -23,7 +23,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-storage-service:{{ .Values.BACKEND.STATELESS.STORAGE.SERVICE.IMAGE.TAG }}
+        - image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-storage-service:{{ .Values.BACKEND.STATELESS.STORAGE.SERVICE.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.STORAGE.SERVICE.IMAGE.PULLPOLICY }}
           name: todo-storage-service
           envFrom:

@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-cache-service
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-cache-service:{{ .Values.BACKEND.STATELESS.CACHE.SERVICE.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-cache-service:{{ .Values.BACKEND.STATELESS.CACHE.SERVICE.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.CACHE.SERVICE.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

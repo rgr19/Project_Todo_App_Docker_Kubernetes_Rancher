@@ -33,7 +33,7 @@ spec:
                 name: todo-secret
       containers:
         - name: todo-search-service
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-service:{{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-service:{{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.SEARCH.SERVICE.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

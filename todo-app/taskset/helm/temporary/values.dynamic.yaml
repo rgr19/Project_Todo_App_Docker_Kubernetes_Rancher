@@ -3,8 +3,8 @@
   "DOCKER_HUB_ID": "onceawaken"
   "GITHUB_BRANCH": "010_todo_app_with_helm_for_kubernetes"
   "GITHUB_USER": "rgr19"
-  "IMAGES_VERSION": "0.14"
+  "IMAGES_VERSION": "0.1"
   "NAMESPACE": "todo"
-  "PROJECT_VERSION": "0.0.6"
+  "PROJECT_VERSION": "0.0.1"
   "RUNTIME_TYPE": "helm"
 

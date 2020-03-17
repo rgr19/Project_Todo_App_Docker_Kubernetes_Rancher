@@ -28,7 +28,7 @@ spec:
                 name: todo-secret
       containers:
         - name: todo-postgres
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-postgres:{{ .Values.BACKEND.STATEFUL.POSTGRES.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-postgres:{{ .Values.BACKEND.STATEFUL.POSTGRES.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATEFUL.POSTGRES.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

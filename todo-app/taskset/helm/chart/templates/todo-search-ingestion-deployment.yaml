@@ -41,7 +41,7 @@ spec:
                 name: todo-secret
       containers:
         - name: todo-search-ingestion
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-ingestion:{{ .Values.BACKEND.STATELESS.SEARCH.INGESTION.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-search-ingestion:{{ .Values.BACKEND.STATELESS.SEARCH.INGESTION.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.SEARCH.INGESTION.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

@@ -44,7 +44,7 @@ symlink_dev_files
 symlink_prod_files
 cd "$WDIR"
 reload_env ".env.dc .env.aws" "../../.envfiles/"*
-# expand env variables into template and save to Dockerrun.aws.json
+# expand env variables into template and save to Dockerrun.aws_task.json
 template_substitute_env_vars \
     ".env" \
     "template/Dockerrun.aws_template.json" \

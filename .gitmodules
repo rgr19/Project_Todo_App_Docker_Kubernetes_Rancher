@@ -1,0 +1,3 @@
+[submodule "todo-app/taskset/helm/repo"]
+	path = todo-app/taskset/helm/repo
+	url = git@github.com:rgr19/todo-app-helm-chart.git

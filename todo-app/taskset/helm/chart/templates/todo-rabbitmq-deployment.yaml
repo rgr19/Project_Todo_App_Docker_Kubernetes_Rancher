@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-rabbitmq
-          image: rabbitmq:{{ .Values.BACKEND.STATELESS.RABBITMQ.IMAGE.TAG }}
+          image: 'rabbitmq:{{ .Values.BACKEND.STATELESS.RABBITMQ.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.RABBITMQ.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

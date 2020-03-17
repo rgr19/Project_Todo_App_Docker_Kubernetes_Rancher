@@ -28,7 +28,7 @@ spec:
           command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
       containers:
         - name: todo-cache-ingestion
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-cache-ingestion:{{ .Values.BACKEND.STATELESS.CACHE.INGESTION.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-cache-ingestion:{{ .Values.BACKEND.STATELESS.CACHE.INGESTION.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATELESS.CACHE.INGESTION.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

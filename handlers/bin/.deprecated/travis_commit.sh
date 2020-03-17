@@ -34,7 +34,7 @@ get_github_branch_current >.envfiles/GITHUB_BRANCH
 get_git_user_name >.envfiles/GITHUB_USER
 
 TEMPLATE_TRAVIS_BASE_YML=taskset/travis/template/.travis.base.yaml
-TEMPLATE_TRAVIS_AWS_YML=taskset/aws/template/.travis.aws.yaml
+TEMPLATE_TRAVIS_AWS_YML=taskset/aws_task/template/.travis.aws_task.yaml
 TRAVIS_YML=.travis.yml
 
 echo "[INFO] Get $TRAVIS_YML from templates for TASK:"
@@ -75,8 +75,8 @@ SECRETS="
   BUILD_TYPE=prod
 "
 AWS_SECRETS="
-  AWS_SECRET_KEY=$(cat .secretfiles/aws/AWS_SECRET_KEY)
-  AWS_KEY_ID=$(cat .secretfiles/aws/AWS_KEY_ID)
+  AWS_SECRET_KEY=$(cat .secretfiles/aws_task/AWS_SECRET_KEY)
+  AWS_KEY_ID=$(cat .secretfiles/aws_task/AWS_KEY_ID)
 "
 
 if [[ "$TASK" == "AWS" ]]; then

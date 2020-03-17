@@ -24,7 +24,7 @@
       "HOST": "todo-postgres"
       "IMAGE":
         "PULLPOLICY": "Always"
-        "TAG": "0.14"
+        "TAG": "0.1"
       "MEMORY": "1Gi"
       "PORT":
         "CLUSTER": "5432"
@@ -54,14 +54,14 @@
       "INGESTION":
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "128Mi"
         "REPLICAS": "1"
       "SERVICE":
         "HOST": "todo-cache-service"
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "128Mi"
         "PORT":
           "CLUSTER": "3000"
@@ -95,14 +95,14 @@
       "INGESTION":
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "256Mi"
         "REPLICAS": "1"
       "SERVICE":
         "HOST": "todo-search-service"
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "256Mi"
         "PORT":
           "CLUSTER": "3000"
@@ -114,14 +114,14 @@
       "INGESTION":
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "128Mi"
         "REPLICAS": "1"
       "SERVICE":
         "HOST": "todo-storage-service"
         "IMAGE":
           "PULLPOLICY": "Always"
-          "TAG": "0.14"
+          "TAG": "0.1"
         "MEMORY": "128Mi"
         "PORT":
           "CLUSTER": "3000"
@@ -133,7 +133,7 @@
   "VIEW":
     "IMAGE":
       "PULLPOLICY": "Always"
-      "TAG": "0.14"
+      "TAG": "0.1"
     "MEMORY": "768Mi"
     "PORT":
       "CLUSTER":
@@ -150,7 +150,7 @@
   "APIGATEWAY":
     "IMAGE":
       "PULLPOLICY": "Always"
-      "TAG": "0.14"
+      "TAG": "0.1"
     "MEMORY": "128Mi"
     "PORT":
       "CLUSTER": "3000"
@@ -160,7 +160,7 @@
   "PROXY":
     "IMAGE":
       "PULLPOLICY": "Always"
-      "TAG": "0.14"
+      "TAG": "0.1"
     "MEMORY": "128Mi"
     "PORT":
       "CLUSTER": "8080"
@@ -177,10 +177,10 @@
     "BRANCH": "010_todo_app_with_helm_for_kubernetes"
     "USER": "rgr19"
   "IMAGES":
-    "VERSION": "0.14"
+    "VERSION": "0.1"
   "NAMESPACE": "todo"
   "PROJECT":
-    "VERSION": "0.0.6"
+    "VERSION": "0.0.1"
   "RUNTIME":
     "TYPE": "helm"
 

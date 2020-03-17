@@ -326,7 +326,7 @@ function loop_curl_and_block() {
 
 function expand_template_yamls() {
   print_ntimes "#" 100
-  # expand env variables into template and save to Dockerrun.aws.json
+  # expand env variables into template and save to Dockerrun.aws_task.json
   echo "[INFO: ${LINENO}] : Expand env variables in YAML templates:"
 
   local SRC_DIR="$1"

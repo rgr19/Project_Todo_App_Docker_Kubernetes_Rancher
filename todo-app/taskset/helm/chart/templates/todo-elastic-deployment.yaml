@@ -21,7 +21,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-elastic
-          image: elasticsearch:{{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.IMAGE.TAG }}
+          image: 'elasticsearch:{{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.BACKEND.STATEFUL.ELASTICSEARCH.IMAGE.PULLPOLICY }}
           env:
             - name: discovery.type

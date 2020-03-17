@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: todo-view
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-view:{{ .Values.FRONTEND.VIEW.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-view:{{ .Values.FRONTEND.VIEW.IMAGE.TAG }}'
           imagePullPolicy: {{ .Values.FRONTEND.VIEW.IMAGE.PULLPOLICY }}
           envFrom:
             - configMapRef:

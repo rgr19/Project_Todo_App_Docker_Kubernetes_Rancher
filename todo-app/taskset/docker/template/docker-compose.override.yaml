@@ -2,32 +2,32 @@ version: "DOCKER_COMPOSE_VERSION"
 
 services:
   todo-postgres:
-    image: ${VARS_DOCKER_HUB_ID}/todo-postgres:${BACKEND_STATEFUL_POSTGRES_IMAGE_TAG}
+    image: todo-postgres:${BACKEND_STATEFUL_POSTGRES_IMAGE_TAG}
   todo-cache-ingestion:
-    image: ${VARS_DOCKER_HUB_ID}/todo-cache-ingestion:${BACKEND_STATELESS_CACHE_INGESTION_IMAGE_TAG}
+    image: todo-cache-ingestion:${BACKEND_STATELESS_CACHE_INGESTION_IMAGE_TAG}
     #we are no longer executing by root, but with user node
     command: sh /home/node/app/start.sh
   todo-cache-service:
-    image: ${VARS_DOCKER_HUB_ID}/todo-cache-service:${BACKEND_STATELESS_CACHE_SERVICE_IMAGE_TAG}
+    image: todo-cache-service:${BACKEND_STATELESS_CACHE_SERVICE_IMAGE_TAG}
   todo-search-ingestion:
-    image: ${VARS_DOCKER_HUB_ID}/todo-search-ingestion:${BACKEND_STATELESS_SEARCH_INGESTION_IMAGE_TAG}
+    image: todo-search-ingestion:${BACKEND_STATELESS_SEARCH_INGESTION_IMAGE_TAG}
     command: sh /home/node/app/start.sh
   todo-search-service:
-    image: ${VARS_DOCKER_HUB_ID}/todo-search-service:${BACKEND_STATELESS_SEARCH_SERVICE_IMAGE_TAG}
+    image: todo-search-service:${BACKEND_STATELESS_SEARCH_SERVICE_IMAGE_TAG}
     command: sh /home/node/app/start.sh
   todo-storage-ingestion:
-    image: ${VARS_DOCKER_HUB_ID}/todo-storage-ingestion:${BACKEND_STATELESS_STORAGE_INGESTION_IMAGE_TAG}
+    image: todo-storage-ingestion:${BACKEND_STATELESS_STORAGE_INGESTION_IMAGE_TAG}
     command: sh /home/node/app/start.sh
   todo-storage-service:
-    image: ${VARS_DOCKER_HUB_ID}/todo-storage-service:${BACKEND_STATELESS_STORAGE_SERVICE_IMAGE_TAG}
+    image: todo-storage-service:${BACKEND_STATELESS_STORAGE_SERVICE_IMAGE_TAG}
   todo-api-gateway:
-    image: ${VARS_DOCKER_HUB_ID}/todo-api-gateway:${ROUTING_APIGATEWAY_IMAGE_TAG}
+    image: todo-api-gateway:${ROUTING_APIGATEWAY_IMAGE_TAG}
     command: sh /home/node/app/start.sh
   todo-view:
-    image: ${VARS_DOCKER_HUB_ID}/todo-view:${FRONTEND_VIEW_IMAGE_TAG}
+    image: todo-view:${FRONTEND_VIEW_IMAGE_TAG}
     # dc is appending to array, not overriding it,
     # so we can not use 4200 again
     ports:
       - 4201:${FRONTEND_VIEW_PORT_TARGET_HTTP} # to match todo-view/custom.nginx
   todo-proxy:
-    image: ${VARS_DOCKER_HUB_ID}/todo-proxy:${ROUTING_PROXY_IMAGE_TAG}
+    image: todo-proxy:${ROUTING_PROXY_IMAGE_TAG}

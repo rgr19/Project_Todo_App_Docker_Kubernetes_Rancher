@@ -29,7 +29,7 @@ spec:
       containers:
         - name: todo-api-gateway
           imagePullPolicy: {{ .Values.ROUTING.APIGATEWAY.IMAGE.PULLPOLICY }}
-          image: {{ .Values.VARS.DOCKER.HUB.ID }}/todo-api-gateway:{{ .Values.ROUTING.APIGATEWAY.IMAGE.TAG }}
+          image: '{{ .Values.VARS.DOCKER.HUB.ID }}/todo-api-gateway:{{ .Values.ROUTING.APIGATEWAY.IMAGE.TAG }}'
           envFrom:
             - configMapRef:
                 name: todo-config
