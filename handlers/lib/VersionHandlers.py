@@ -17,7 +17,7 @@ def version_parser(v):
 
 
 def parse_project_version(version: str):
-	cacheFile = '.project_versions_used'
+	cacheFile = '.cache/project.versions'
 	if not os.path.exists(cacheFile):
 		open(cacheFile, 'w').write('')
 		prevVersions = set()
@@ -66,7 +66,7 @@ def parse_project_version(version: str):
 
 
 def parse_images_version(version: str):
-	cacheFile = '.images_versions_used'
+	cacheFile = '.cache/images.versions'
 	versionTuple = lastVersionTuple = (0, 1)
 
 	if not os.path.exists(cacheFile):
