@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.7.7
 import abc
 import os
-from shutil import copyfile
+from shutil import copyfile, move
 from typing import Type
 
 from handlers.lib.Executor import Executor, ExecutorAbstract
@@ -128,7 +128,7 @@ class TravisConfigurator(TasksetConfig):
 
 	def move_travis_config_to_dest(self):
 		destTravisYml = os.path.join(self.destPath, self.TRAVIS_YML)
-		copyfile(self.travisYmlPath, destTravisYml)
+		move(self.travisYmlPath, destTravisYml)
 		return self
 
 	def load_envvars_and_secrets(self, *customSecrets: str):
@@ -214,9 +214,5 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
 		GitExecutor(repoPath).upload(gitMessage)
 
 
-class TravisSubmoduleExecutor(TravisExecutor, TravisConfigurator):
 
-	def __call__(self, subcommand: str = None) -> Executor:
-		logger.debug(f'{__class__.__name__}.__call__ => {self.TRAVIS} {subcommand} with CWD {self.destPath} ')
-		return Executor(self.TRAVIS).with_cwd(self.destPath).with_subcommand(subcommand)
 

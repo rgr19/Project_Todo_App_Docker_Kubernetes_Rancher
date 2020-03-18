@@ -125,7 +125,7 @@ class SetupParserTasks(object):
 	def setup_ci(self):
 		automate = self.operationParsers.add_parser("CI", aliases=['ci'], )
 		automate.set_defaults(config_task=[DockerCompose.main, Travis.main, Helm.main])
-		automate.set_defaults(main_task=[DockerCompose.build, Travis.basic, TravisSubmodule.helm])
+		automate.set_defaults(main_task=[DockerCompose.build, Travis.basic, Travis.logs, TravisSubmodule.helm, Travis.logs])
 		automate.set_defaults(DO_RELOAD=True)
 		
 	def parse_args(self, argv, ):

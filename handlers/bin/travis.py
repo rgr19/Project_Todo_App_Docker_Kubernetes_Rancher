@@ -3,7 +3,7 @@ from pprint import pprint
 
 from handlers.lib.Helm import HelmExecutor
 from handlers.lib.Logger import Logger
-from handlers.lib.Travis import TravisConfigurator, TravisExecutor, TravisTasks, TravisSubmoduleExecutor
+from handlers.lib.Travis import TravisConfigurator, TravisExecutor, TravisTasks
 
 logger = Logger.build(__name__)
 
@@ -39,4 +39,4 @@ class TravisSubmodule(TravisConfigurator):
 		helm = HelmExecutor(**configurationKwargs)
 		helm.main(**configurationKwargs)
 		helm.dry_run()
-		TravisSubmoduleExecutor(TravisTasks.HelmRepo, destPath=helm.repoPath, **configurationKwargs).task(gitMessage, *secrets)
+		TravisExecutor(TravisTasks.HelmRepo, destPath=helm.repoPath, **configurationKwargs).task(gitMessage, *secrets)
