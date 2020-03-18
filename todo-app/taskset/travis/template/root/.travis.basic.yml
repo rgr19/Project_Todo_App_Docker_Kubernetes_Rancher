@@ -14,11 +14,11 @@ before_install:
   - bash ./setup/fix/no_public_key_fix.sh
   - bash ./setup/install/docker_install.sh
 before_script:
-  - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
-  - docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
+  - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev -t todo-view-test
+  - docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev -t todo-cache-service-test
 script:
-  - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox --watch=false --no-progress
-  - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
+  - docker run todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox --watch=false --no-progress
+  - docker run todo-cache-service-test npm test
 after_success:
   - python3.7 main.py DC BUILD
   - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin

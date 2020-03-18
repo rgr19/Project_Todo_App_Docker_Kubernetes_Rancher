@@ -15,13 +15,13 @@ before_install:
 - bash ./setup/install/docker_install.sh
 before_script:
 - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev
-  -t $DOCKER_HUB_ID/todo-view-test
+  -t todo-view-test
 - docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev
-  -t $DOCKER_HUB_ID/todo-cache-service-test
+  -t todo-cache-service-test
 script:
-- docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
-  --watch=false --no-progress
-- docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
+- docker run todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox --watch=false
+  --no-progress
+- docker run todo-cache-service-test npm test
 after_success:
 - python3.7 main.py DC BUILD
 - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
@@ -30,4 +30,4 @@ git:
   submodules: false
 env:
   global:
-    secure: mPZzujgct2alzEwpVz9MG8hPkuCd791Fgn62ELAbiPsEnlAePZ7kcGb59cGU7GO1IYFAjBovtJCGoxr8J6Kx2mgb2xiuJqI2muny3A/RUfiEs2YRbqdV56VlmdN3zD+roFcNHpFIbWVo1uHr58kb45XnmlGxYfCDyKsJvF7ChKAehq1znvLWK8nRZZHnNg9FbgvyqqomEDMFAjwFBPaisnTvQnwwER+qcw9Z2JcB5jPeSgxVXxMRA+Uxqi48GCdsf/mFzJ+Y8JXXicBRTrbmb9tP4yeZ4y78RdGI2Rd9Ega5HrZOhcl++HNhfJw3PKuDz0+6kHBKInXLMdN+lXaTfqQVQ82xb91wnmpaKvBiXG8ap4SfdSOvyjYxxMnLCLk/m0yQEXNNgAoUOGOvJK6WQu/1JK0oRMq6BT0cq4COjC/qMbKercX2yHNbb/tUkEo2ux11x2ApRH1Dc/rmfvhne27gX7yVMhj0xNBESNwQntejIPTFi5LYEvohM3tQRFxmiQZ2ICOMIifp3CCVOBKaTtAl1Br8p+/yJGOlNCpniCtniicLw185BXzCtV1APyvb2sUqkLDYzoSxOClsGDfaCrcBuwhb59souYjoc5wDyJPBfF2wvDPnrEay4zZs+Bb35HWmnNVw0vPB4LWIHH1sC+CaboQl/sXJV4rbZqOPjow=
+    secure: sA7xw84DD6qihwiEBwnwgpGlgQWnpGuxSm6Y9Z82K8UKAb7kthJcX0YqM5dne0ZxDi8aqTdGovOw0AMCArKCwgHuF4G8c3Bgyw3w+YECYtLYpzJJg8fPSc4WDmIQE6VMg9N6gXX87jv+OqMPAktyssvp0uCGsGf8YOTQmtDIprmKsjPvElDcbkDvBMHXA7cFp7VDU6REp8/Fa4vf9FT128sUeRmc5vLjcuTqBGYjmq+RvACv49EWD7qz8RDEL0HdI9ek97SNEILMvY0z9DQE2TYQ/DGbMhHZ36TGuMAVh1rG25unMs/cmXZByWTg0xu8go3XDBKLYfHCR+/wUhljvGvpWdFcMLr+HrS26+UX+8sv/z+GX1WRfzGqiJB4nCrvStEc/Nhd+4cN2oFp5vAUm0o3XtJEwoOpW7xMgfLMhDopZMSmdQJA1qZXAwdj3Zrmh6PGh4z0/Est4fsKA9BL8DWnrzG204nfGas1xamosgMWXSUWOkeLW+0NJ2R/yEEt27Ii0hoAK0vPmkp1ZjotwdlLep7gqb5geP37JPyi9HQKixcse/8OJjLItqggja9kqTchvr/g5ouUIvi1TEpOZkJ12f6c6vaSipXYpjinABLTQLuRFU9AJCCDlPVlXjM//P42Ud6qkK0dtS4rN4hjPlbDXF120G6niTBFaqaYIH0=
