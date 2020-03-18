@@ -10,8 +10,8 @@ MAKEFLAGS += --jobs=3
 pip:
 	pip install -r requirements.txt
 
-CI:
-	python3.7 main.py CI
+CID:
+	python3.7 main.py CID
 
 prod:
 	python3.7 main.py PROD

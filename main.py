@@ -27,7 +27,7 @@ class SetupParserTasks(object):
 		# self.setup_kompose_parser()
 		# self.setup_k8s_parser()
 		self.setup_automate()
-		self.setup_ci()
+		self.setup_cid()
 
 	def setup_docker_compose_parser(self):
 		epilog = 'Note: Helm values.yaml will be converted to .env.helm and used.'
@@ -117,13 +117,13 @@ class SetupParserTasks(object):
 		argsK8s = self.operationParsers.add_parser("K8S", aliases=['K'], )
 
 	def setup_automate(self, ):
-		automate = self.operationParsers.add_parser("AUTOMATE", aliases=['a'], )
+		automate = self.operationParsers.add_parser("PROD", aliases=['p'], )
 		automate.set_defaults(config_task=[DockerCompose.main, Travis.main, Helm.main])
 		automate.set_defaults(main_task=[DockerCompose.build, Travis.basic, Helm.reinstall])
 		automate.set_defaults(DO_RELOAD=True)
 		
-	def setup_ci(self):
-		automate = self.operationParsers.add_parser("CI", aliases=['ci'], )
+	def setup_cid(self):
+		automate = self.operationParsers.add_parser("CID", aliases=['cid'], )
 		automate.set_defaults(config_task=[DockerCompose.main, Travis.main, Helm.main])
 		automate.set_defaults(main_task=[DockerCompose.build, Travis.basic, Travis.logs, TravisSubmodule.helm, Travis.logs])
 		automate.set_defaults(DO_RELOAD=True)
