@@ -100,7 +100,7 @@ class TravisConfigurator(TasksetConfig):
 		assert (t in self.TASK_MAP.values() for t in tasks)
 
 		self.tasksList: tuple = tasks
-		self.tasksNames: list = [t.TASK_MODE for t in self.tasksList]
+		self.tasksNames: str = ' '.join([t.TASK_MODE for t in self.tasksList])
 		self.taskYamlsUsed: list = []
 		self.envVarsSecrets: list = []
 
@@ -117,19 +117,17 @@ class TravisConfigurator(TasksetConfig):
 		FileWrite(self.GITHUB_USER_ENVFILE, gitUserName)
 		return self
 
-	def merge_travis_templates_to(self):
+	def merge_travis_templates(self):
 		logger.debug(f'{__class__.__name__}.merge_travis_templates_to')
 
 		destTravisYml = os.path.join(self.destPath, self.TRAVIS_YML)
 
-		taskYamlsUsed: list = []
 		for task in self.tasksList:
 			templateTravisAwsYml = os.path.join(self.templatePath, task.TRAVIS_YML)
 			self.taskYamlsUsed.append(templateTravisAwsYml)
 
-		YamlConcatWrite.as_is(self.travisYmlPath, *taskYamlsUsed)
+		YamlConcatWrite.as_is(self.travisYmlPath, *self.taskYamlsUsed)
 		copyfile(self.travisYmlPath, destTravisYml)
-
 		return self
 
 	def load_envvars_and_secrets(self, *customSecrets: str):
@@ -211,8 +209,7 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
 
 	def task(self, gitMessage: str, *secrets: str):
 		logger.debug(f'{__class__.__name__}.task')
-		self.merge_travis_templates_to()
-		logger.debug(f'{__class__.__name__}.task')
+		self.merge_travis_templates()
 		self.load_envvars_and_secrets(*secrets)
 		self.encrypt(*self.envVarsSecrets, )
 		if not gitMessage:
@@ -229,3 +226,12 @@ class TravisSubmoduleExecutor(TravisExecutor, TravisConfigurator):
 	def helm(self, gitMessage: str, *secrets: str):
 		logger.debug(f'{__class__.__name__}.helm')
 		self.task(gitMessage, *secrets)
+
+	def task(self, gitMessage: str, *secrets: str):
+		logger.debug(f'{__class__.__name__}.task')
+		self.merge_travis_templates()
+		self.load_envvars_and_secrets(*secrets)
+		self.encrypt(*self.envVarsSecrets, )
+		if not gitMessage:
+			gitMessage = f"Travis AUTO commit in MODE {self.tasksNames}"
+		GitExecutor(self.destPath).upload(gitMessage)
