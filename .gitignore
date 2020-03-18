@@ -34,3 +34,7 @@ __pycache__
 # Secrets
 .secretfiles
 */secrets/*
+
+# Temporary
+temp
+temporary
