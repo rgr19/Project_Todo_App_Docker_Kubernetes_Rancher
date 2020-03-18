@@ -18,12 +18,12 @@ class Travis(TravisConfigurator):
 	@staticmethod
 	def basic(gitMessage: str = None, *secrets: str, **configurationKwargs):
 		logger.info(f'{__class__.__name__}.basic')
-		TravisExecutor(TravisTasks.Base, **configurationKwargs).basic_task(gitMessage, *secrets)
+		TravisExecutor(TravisTasks.Base, **configurationKwargs).task(gitMessage, *secrets)
 
 	@staticmethod
 	def aws(gitMessage: str = None, *secrets: str, **configurationKwargs):
 		logger.info(f'{__class__.__name__}.aws')
-		TravisExecutor(TravisTasks.Base, TravisTasks.Aws, **configurationKwargs).aws_task(gitMessage, *secrets)
+		TravisExecutor(TravisTasks.Base, TravisTasks.Aws, **configurationKwargs).task(gitMessage, *secrets)
 
 	@staticmethod
 	def encrypt(*secrets: str, **configurationKwargs):
@@ -39,4 +39,4 @@ class TravisSubmodule(TravisConfigurator):
 		helm = HelmExecutor(**configurationKwargs)
 		helm.main(**configurationKwargs)
 		helm.dry_run()
-		TravisSubmoduleExecutor(TravisTasks.HelmRepo, destPath=helm.repoPath, **configurationKwargs).helm(gitMessage, *secrets)
+		TravisSubmoduleExecutor(TravisTasks.HelmRepo, destPath=helm.repoPath, **configurationKwargs).task(gitMessage, *secrets)

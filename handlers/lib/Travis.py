@@ -118,15 +118,16 @@ class TravisConfigurator(TasksetConfig):
 		return self
 
 	def merge_travis_templates(self):
-		logger.debug(f'{__class__.__name__}.merge_travis_templates_to')
-
-		destTravisYml = os.path.join(self.destPath, self.TRAVIS_YML)
-
+		logger.debug(f'{__class__.__name__}.merge_travis_templates DEST_PATH => {self.destPath}')
 		for task in self.tasksList:
 			templateTravisAwsYml = os.path.join(self.templatePath, task.TRAVIS_YML)
 			self.taskYamlsUsed.append(templateTravisAwsYml)
 
 		YamlConcatWrite.as_is(self.travisYmlPath, *self.taskYamlsUsed)
+		return self
+
+	def move_travis_config_to_dest(self):
+		destTravisYml = os.path.join(self.destPath, self.TRAVIS_YML)
 		copyfile(self.travisYmlPath, destTravisYml)
 		return self
 
@@ -199,22 +200,18 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
 		logger.debug(f'{__class__.__name__}.enable')
 		self(TravisKeys.ENABLE).with_flags(TravisKeys.ORG).spawn()
 
-	def basic_task(self, gitMessage: str, *secrets: str):
-		logger.debug(f'{__class__.__name__}.basic')
-		self.task(gitMessage, *secrets)
-
-	def aws_task(self, gitMessage: str, *secrets: str):
-		logger.debug(f'{__class__.__name__}.aws')
-		self.task(gitMessage, *secrets)
-
 	def task(self, gitMessage: str, *secrets: str):
 		logger.debug(f'{__class__.__name__}.task')
 		self.merge_travis_templates()
 		self.load_envvars_and_secrets(*secrets)
 		self.encrypt(*self.envVarsSecrets, )
+		self.move_travis_config_to_dest()
+		self.push(gitMessage, self.destPath)
+
+	def push(self, gitMessage: str, repoPath: str):
 		if not gitMessage:
 			gitMessage = f"Travis AUTO commit in MODE {self.tasksNames}"
-		GitExecutor(self.cwdPath).upload(gitMessage)
+		GitExecutor(repoPath).upload(gitMessage)
 
 
 class TravisSubmoduleExecutor(TravisExecutor, TravisConfigurator):
@@ -223,15 +220,3 @@ class TravisSubmoduleExecutor(TravisExecutor, TravisConfigurator):
 		logger.debug(f'{__class__.__name__}.__call__ => {self.TRAVIS} {subcommand} with CWD {self.destPath} ')
 		return Executor(self.TRAVIS).with_cwd(self.destPath).with_subcommand(subcommand)
 
-	def helm(self, gitMessage: str, *secrets: str):
-		logger.debug(f'{__class__.__name__}.helm')
-		self.task(gitMessage, *secrets)
-
-	def task(self, gitMessage: str, *secrets: str):
-		logger.debug(f'{__class__.__name__}.task')
-		self.merge_travis_templates()
-		self.load_envvars_and_secrets(*secrets)
-		self.encrypt(*self.envVarsSecrets, )
-		if not gitMessage:
-			gitMessage = f"Travis AUTO commit in MODE {self.tasksNames}"
-		GitExecutor(self.destPath).upload(gitMessage)
