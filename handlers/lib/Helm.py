@@ -143,6 +143,8 @@ class HelmConfigurator(TasksetConfig):
 		GitExecutor(helm.repoPath).checkout_branch(GitExecutor.MASTER)
 		helm.copy_chart_to_repo()
 
+		return helm
+
 
 class KubectlExecutor(ExecutorAbstract):
 	KUBECTL: str = 'kubectl'
@@ -209,13 +211,13 @@ class HelmExecutor(ExecutorAbstract, HelmConfigurator):
 		logger.debug(f'{__class__.__name__}.upgrade')
 		self(self.UPGRADE).with_args(self.PROJECT_NAME, self.CHART).with_flags(self.DEBUG, self.FORCE).exec(exitOnError=False)
 
-	def dry_run(self):
+	def dry_run(self, quiet=False):
 		logger.debug(f'{__class__.__name__}.dry_run')
 
 		out: str = self(self.INSTALL) \
 			.with_args(self.PROJECT_NAME, self.CHART) \
 			.with_flags(self.REPLACE, self.DEBUG, self.DRY_RUN) \
-			.exec()
+			.exec(quiet=quiet)
 
 		stdoutPath = os.path.join(self.tempOutputPath, self.DRY_RUN + ".yaml")
 		FileWrite(stdoutPath, out)

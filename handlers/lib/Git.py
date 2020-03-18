@@ -22,6 +22,7 @@ class GitExecutor(ExecutorAbstract):
 	ORIGIN: str = 'origin'
 	MASTER: str = 'master'
 	GH_PAGES: str = 'gh-pages'
+	VERBOSE: str = 'verbose'
 
 	def __init__(self, cwd: str = None):
 		self.cwd = cwd
@@ -43,16 +44,16 @@ class GitExecutor(ExecutorAbstract):
 
 	def add_all(self):
 		logger.debug(f'{__class__.__name__}.add_all')
-		self(self.ADD).with_flags(self.ALL).spawn()
+		self(self.ADD).with_flags(self.ALL).with_flags(self.VERBOSE).spawn()
 
 	def commit_msg(self, msg: str, *_):
 		logger.debug(f'{__class__.__name__}.commit_msg => MSG : {msg}')
-		self(self.COMMIT).with_kwarg(self.MESSAGE, msg).spawn()
+		self(self.COMMIT).with_kwarg(self.MESSAGE, msg).with_flags(self.VERBOSE).spawn()
 
 	def push_origin(self):
 		branch: str = self.branch()
 		logger.debug(f'{__class__.__name__}.push_origin => BRANCH: {branch}')
-		self(self.PUSH).with_args(self.ORIGIN, branch).spawn()
+		self(self.PUSH).with_args(self.ORIGIN, branch).with_flags(self.VERBOSE).spawn()
 
 	def upload(self, gitMessage: str = None, ):
 		logger.debug(f'{__class__.__name__}.upload GIT_MESSAGE => {gitMessage}')

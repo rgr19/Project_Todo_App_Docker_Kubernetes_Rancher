@@ -105,7 +105,7 @@ class Executor(object):
 			self.cmd.append(f'--{arg}')
 		return self
 
-	def exec(self, doUntilOk=False, exitOnError=True) -> str:
+	def exec(self, doUntilOk=False, exitOnError=True, quiet=False) -> str:
 		logger.info(f'{self.__class__.__name__} begin EXEC : {self.cmd} in CWD: {self.cwd}')
 		if not self.cmd:
 			logger.exception(f"No command provided CMD: {self.cmd}")
@@ -117,10 +117,11 @@ class Executor(object):
 				process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.cwd)
 				stdout, stderr = process.communicate()
 				out = ExecutorOutputParser(stdout, stderr, process.returncode)
-				out.print()
+				if not quiet:
+					out.print()
 				if doUntilOk and out.returncode:
 					logger.error(f"Subprocess failed with returncode: {out.returncode}. Try again...")
-					self.exec(doUntilOk, exitOnError)
+					return self.exec(doUntilOk, exitOnError)
 				if out.returncode:
 					logger.exception(f"Subprocess returned with exitcode {out.returncode}")
 					if exitOnError:
@@ -132,7 +133,7 @@ class Executor(object):
 			logger.exception(f'{self.__class__.__name__} keyboard interrupt in EXEC : {self.cmd} in CWD: {self.cwd}')
 			exit(3)
 
-	def spawn(self, doUntilOk=False, exitOnError=True) -> None:
+	def spawn(self, doUntilOk=False, exitOnError=True, quiet=False) -> None:
 		logger.info(f'{self.__class__.__name__} begin SPAWN : {self.cmd} in CWD: {self.cwd}')
 		if not self.cmd:
 			logger.exception(f"No command provided CMD: {self.cmd}")
@@ -141,14 +142,15 @@ class Executor(object):
 			try:
 				returncode = subprocess.check_call(self.cmd, cwd=self.cwd)
 				out = ExecutorOutputParser(returncode=returncode)
-				out.print()
+				if not quiet:
+					out.print()
 				if returncode:
 					logger.exception(f"Subprocess returned with exitcode {returncode}")
 					if exitOnError:
 						exit(2)
 					elif doUntilOk:
 						logger.error(f"Subprocess failed spawn with exitcode {returncode}. Try again...")
-						self.spawn(doUntilOk, exitOnError)
+						return self.spawn(doUntilOk, exitOnError)
 			except KeyboardInterrupt:
 				logger.exception(f'{self.__class__.__name__} keyboard interrupt in SPAWN : {self.cmd} in CWD: {self.cwd}')
 				exit(4)
@@ -158,7 +160,7 @@ class Executor(object):
 					exit(3)
 				logger.error(f"Subprocess failed spawn. Try again...")
 				if doUntilOk:
-					self.spawn(doUntilOk, exitOnError)
+					return self.spawn(doUntilOk, exitOnError)
 
 		logger.info(f'{self.__class__.__name__} end SPAWN : {self.cmd} in CWD: {self.cwd}')
 

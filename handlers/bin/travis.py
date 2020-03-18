@@ -37,6 +37,6 @@ class TravisSubmodule(TravisConfigurator):
 		logger.info(f'{__class__.__name__}.helm')
 		pprint(configurationKwargs)
 		helm = HelmExecutor(**configurationKwargs)
-		helm.main(**configurationKwargs)
-		helm.dry_run()
+		helm.repo(**configurationKwargs)
+		helm.dry_run(quiet=True)
 		TravisExecutor(TravisTasks.HelmRepo, destPath=helm.repoPath, **configurationKwargs).task(gitMessage, *secrets)

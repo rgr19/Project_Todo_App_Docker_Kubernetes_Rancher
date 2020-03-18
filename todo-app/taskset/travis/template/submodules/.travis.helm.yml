@@ -1,4 +1,5 @@
 dist: xenial
+sudo: required
 # Install Helm and Kubeval
 before_install:
   - bash install/helm_kubeval_install.sh
@@ -27,3 +28,6 @@ deploy:
   local_dir: ./distribution
   on:
     branch: master
+
+env:
+  - TRAVIS_SECURE_ENV_VARS=true

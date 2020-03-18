@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.7.7
 import abc
 import os
-from shutil import copyfile, move
+from shutil import move
 from typing import Type
 
 from handlers.lib.Executor import Executor, ExecutorAbstract
@@ -118,7 +118,7 @@ class TravisConfigurator(TasksetConfig):
 		return self
 
 	def merge_travis_templates(self):
-		logger.debug(f'{__class__.__name__}.merge_travis_templates DEST_PATH => {self.destPath}')
+		logger.debug(f'{__class__.__name__}.merge_travis_templates')
 		for task in self.tasksList:
 			templateTravisAwsYml = os.path.join(self.templatePath, task.TRAVIS_YML)
 			self.taskYamlsUsed.append(templateTravisAwsYml)
@@ -127,6 +127,7 @@ class TravisConfigurator(TasksetConfig):
 		return self
 
 	def move_travis_config_to_dest(self):
+		logger.debug(f'{__class__.__name__}.move_travis_config_to_dest => {self.destPath}')
 		destTravisYml = os.path.join(self.destPath, self.TRAVIS_YML)
 		move(self.travisYmlPath, destTravisYml)
 		return self
@@ -188,9 +189,10 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
 		logger.debug(f'{__class__.__name__}.__call__ => {TravisKeys.TRAVIS} {subcommand} with CWD {self.cwdPath} ')
 		return Executor(TravisKeys.TRAVIS).with_cwd(self.cwdPath).with_subcommand(subcommand)
 
-	def encrypt(self, *secrets):
+	def encrypt(self, destPath, *secrets):
 		logger.debug(f'{__class__.__name__}.encrypt')
-		self(TravisKeys.ENCRYPT).with_args(*secrets).with_kwarg(TravisKeys.ADD, TravisKeys.ENV_GLOBAL).with_flags(TravisKeys.OVERRIDE, TravisKeys.ORG).spawn()
+		# NOTE: encrypt has to be executed in repository/submodule root, otherwise secrets wont be decrypted properly
+		self(TravisKeys.ENCRYPT).with_cwd(destPath).with_args(*secrets).with_kwarg(TravisKeys.ADD, TravisKeys.ENV_GLOBAL).with_flags(TravisKeys.OVERRIDE, TravisKeys.ORG).spawn()
 
 	def logs(self, *secrets):
 		logger.debug(f'{__class__.__name__}.logs')
@@ -200,19 +202,26 @@ class TravisExecutor(ExecutorAbstract, TravisConfigurator):
 		logger.debug(f'{__class__.__name__}.enable')
 		self(TravisKeys.ENABLE).with_flags(TravisKeys.ORG).spawn()
 
+	def config_git(self):
+		logger.debug(f'{__class__.__name__}.enable')
+	# FIXME: Change of repo name require to change travis slug in git config
+	# FROM remote origin
+	# git config --get remote.origin.url
+	# git@github.com:rgr19/todo-app.git
+	# to travis slug
+	#  git config --local travis.slug
+	# rgr19/todo-app
+
 	def task(self, gitMessage: str, *secrets: str):
 		logger.debug(f'{__class__.__name__}.task')
 		self.merge_travis_templates()
 		self.load_envvars_and_secrets(*secrets)
-		self.encrypt(*self.envVarsSecrets, )
 		self.move_travis_config_to_dest()
+		self.encrypt(self.destPath, *self.envVarsSecrets)
 		self.push(gitMessage, self.destPath)
 
 	def push(self, gitMessage: str, repoPath: str):
+		logger.debug(f'{__class__.__name__}.push MSG : {gitMessage}, REPO: {repoPath}')
 		if not gitMessage:
 			gitMessage = f"Travis AUTO commit in MODE {self.tasksNames}"
 		GitExecutor(repoPath).upload(gitMessage)
-
-
-
-
