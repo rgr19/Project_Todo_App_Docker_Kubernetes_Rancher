@@ -27,6 +27,7 @@ class SetupParserTasks(object):
 		# self.setup_kompose_parser()
 		# self.setup_k8s_parser()
 		self.setup_automate()
+		self.setup_ci()
 
 	def setup_docker_compose_parser(self):
 		epilog = 'Note: Helm values.yaml will be converted to .env.helm and used.'

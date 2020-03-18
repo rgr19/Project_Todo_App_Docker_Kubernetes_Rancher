@@ -3,31 +3,25 @@ sudo: required
 language: python
 python: 3.7
 install:
-- pip install -r requirements.txt
+  - pip install -r requirements.txt
 services:
-- docker
+  - docker
 addons:
   apt:
     packages:
-    - docker-ce
+      - docker-ce
 before_install:
-- bash ./setup/fix/no_public_key_fix.sh
-- bash ./setup/install/docker_install.sh
+  - bash ./setup/fix/no_public_key_fix.sh
+  - bash ./setup/install/docker_install.sh
 before_script:
-- docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev
-  -t $DOCKER_HUB_ID/todo-view-test
-- docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev
-  -t $DOCKER_HUB_ID/todo-cache-service-test
+  - docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
+  - docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
-- docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
-  --watch=false --no-progress
-- docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
+  - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox --watch=false --no-progress
+  - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
-- python3.7 main.py DC BUILD
-- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
-- python3.7 main.py DC PUSH
+  - python3.7 main.py DC BUILD
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+  - python3.7 main.py DC PUSH
 git:
   submodules: false
-env:
-  global:
-    secure: J147LwfUjMh5E0H6kpdFs76RgiBShpqBYcCdw7Q5lytOy13A1wpQsayE1jBVJgl+tTzgoZ8zP9AAzdDRuSLTN3AtPL8AfJEtIVtoYRUog04bB9RUZqvFjPs9FWfRYxuQaJDKUZVy+qEzw1y0DPj7O8kSsHZtoDv85u+Hobc+H1NskjQgtPW39D2PmObkph9JMqLSSBjVVgVVBpxTXkhbUjb11p1Nkb8Zx5Y5U/e3tHRc8MTmWJxIpAn3AkfBWQ3YUgCbtb4jrlk+juO47bCSPeMMlaCLJyE5UCZjemayZPkVgllstO3XnNpQqNXpixO1Fc8lGvfs77WFciTS7tl+C9vSEtwkhuIYMYkwao1sHGwrA88qYur1c6DvUEEe/ZzhY9owuR7ux2Cq5jLGsMrZF+gJfxOMMzmwcVWhy93Oo7PjFs/44PjHovNrIlbR9W6VDUIK6QEkHU3xdLhtKiQ3Y9AQFBpzsoQi895RNW1mBIcMWT6H8sFtQ27T0CvhkIo+ZpXaMmRRNkrv7S1krYA36HIv7Pvy7TVYMoxQ7QVlcXXqo/gTxl/l/2n0KOQ2y1ii/OKusFERVjgD2tEUq+ka8mbZ3FPgZS3ycteF4vR978I+xPAluredYJRpsa+GTwNEpXvIARHgEXJfJ60rSCj3ienUdtZ8YCTayHb1Q+OYRok=

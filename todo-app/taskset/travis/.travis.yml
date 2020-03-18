@@ -1,29 +1,33 @@
 dist: xenial
-# Install Helm and Kubeval
+sudo: required
+language: python
+python: 3.7
+install:
+- pip install -r requirements.txt
+services:
+- docker
+addons:
+  apt:
+    packages:
+    - docker-ce
 before_install:
-  - bash install/helm_kubeval_install.sh
-
-# Run some tests
+- bash ./setup/fix/no_public_key_fix.sh
+- bash ./setup/install/docker_install.sh
+before_script:
+- docker build ./todo-app/src/todo-view -f ./todo-app/src/todo-view/Dockerfile.dev
+  -t $DOCKER_HUB_ID/todo-view-test
+- docker build ./todo-app/src/todo-cache-service -f ./todo-app/src/common/Dockerfile.nodejs.dev
+  -t $DOCKER_HUB_ID/todo-cache-service-test
 script:
-  # Lint Todo App chart syntax
-  - helm lint charts/todo-app
-  # Validate generated K8s manifests
-  - mkdir manifests
-  - helm template charts/todo-app --output-dir manifests
-  - bash scripts/kubeval_validate_manifest.sh
-
-# Build Todo App Chart and update Chart Index
+- docker run $DOCKER_HUB_ID/todo-view-test npm test -- --browsers=ChromeHeadlessNoSandbox
+  --watch=false --no-progress
+- docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 after_success:
-  - mkdir distribution
-  - helm package charts/todo-app --destination distribution/
-  - helm repo index --url $GITHUB_PAGES_URL/todo-app-helm-chart ./distribution/
-
-# Publish new Todo App Chart
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep_history: true
-  local_dir: ./distribution
-  on:
-    branch: master
+- python3.7 main.py DC BUILD
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+- python3.7 main.py DC PUSH
+git:
+  submodules: false
+env:
+  global:
+    secure: mPZzujgct2alzEwpVz9MG8hPkuCd791Fgn62ELAbiPsEnlAePZ7kcGb59cGU7GO1IYFAjBovtJCGoxr8J6Kx2mgb2xiuJqI2muny3A/RUfiEs2YRbqdV56VlmdN3zD+roFcNHpFIbWVo1uHr58kb45XnmlGxYfCDyKsJvF7ChKAehq1znvLWK8nRZZHnNg9FbgvyqqomEDMFAjwFBPaisnTvQnwwER+qcw9Z2JcB5jPeSgxVXxMRA+Uxqi48GCdsf/mFzJ+Y8JXXicBRTrbmb9tP4yeZ4y78RdGI2Rd9Ega5HrZOhcl++HNhfJw3PKuDz0+6kHBKInXLMdN+lXaTfqQVQ82xb91wnmpaKvBiXG8ap4SfdSOvyjYxxMnLCLk/m0yQEXNNgAoUOGOvJK6WQu/1JK0oRMq6BT0cq4COjC/qMbKercX2yHNbb/tUkEo2ux11x2ApRH1Dc/rmfvhne27gX7yVMhj0xNBESNwQntejIPTFi5LYEvohM3tQRFxmiQZ2ICOMIifp3CCVOBKaTtAl1Br8p+/yJGOlNCpniCtniicLw185BXzCtV1APyvb2sUqkLDYzoSxOClsGDfaCrcBuwhb59souYjoc5wDyJPBfF2wvDPnrEay4zZs+Bb35HWmnNVw0vPB4LWIHH1sC+CaboQl/sXJV4rbZqOPjow=
